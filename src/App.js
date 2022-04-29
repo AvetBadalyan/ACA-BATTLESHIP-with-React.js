@@ -1,6 +1,7 @@
 import { useReducer } from "react";
 import "./App.css";
-import Board from "./Components/Board";
+import OponentBoard from "./Components/OponentBoard";
+import PlayerBoard from "./Components/PlayerBoard";
 import { ACTION_TYPES, defaultState, reducer } from "./State/State";
 
 function App() {
@@ -11,9 +12,9 @@ function App() {
 
   return (
     <>
-      <Board state={state} dispatch={dispatch} player={1} />
+      <PlayerBoard state={state} dispatch={dispatch} player={1} />
       <button onClick={setShipsMode}>Set ships</button>
-      <Board state={state} dispatch={dispatch} player={2} />
+      <OponentBoard state={state} dispatch={dispatch} player={2} />
     </>
   );
 }
