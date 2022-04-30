@@ -1,10 +1,10 @@
 import React from "react";
-import "./../App.css";
-import groupArray from "../helpers/groupArray";
-import setClass, { setOpponentClass } from "../helpers/setClass";
-import { ACTION_TYPES } from "../State/State";
+import "../../App.css";
+import groupArray from "../../helpers/groupArray";
+import setClass, { setOpponentClass } from "../../helpers/setClass";
+import { ACTION_TYPES } from "../../State/State"; 
 
-export default function OponentBoard({ state, dispatch, player }) {
+export default function OpponentBoard({ state, dispatch, player }) {
   const {
     player1: { isSetShipMode, ships },
   } = state;

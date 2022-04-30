@@ -1,8 +1,8 @@
 import React from "react";
-import "./../App.css";
-import groupArray from "../helpers/groupArray";
-import setClass, { setPlayerClass } from "../helpers/setClass";
-import { ACTION_TYPES } from "../State/State";
+import "../../App.css";
+import groupArray from "../../helpers/groupArray";
+import setClass, { setPlayerClass } from "../../helpers/setClass";
+import { ACTION_TYPES } from "../../State/State";
 
 export default function PlayerBoard({ state, dispatch, player }) {
   const {
