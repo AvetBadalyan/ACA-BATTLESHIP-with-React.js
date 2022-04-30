@@ -10,6 +10,10 @@ function App() {
     dispatch({ type: ACTION_TYPES.SET_SET_SHIPS_MODE });
   };
 
+  const {
+    player1: { isSetShipMode , ships}
+  } = state;
+
   return (
     <>
       <PlayerBoard state={state} dispatch={dispatch} player={1} />

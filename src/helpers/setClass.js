@@ -27,3 +27,15 @@ export const setPlayerClass = (state, id) => {
   }
   return classes.join(" ");
 };
+
+export const setOpponentClass = (state, id) => {
+  let classes = [];
+  if (state.beaten.has(id)) {
+    classes.push(CLASS_TYPES.HIT);
+  }
+  if (state.pass.has(id)) {
+    classes.push(CLASS_TYPES.PASS);
+  }
+  return classes.join(" ");
+};
+

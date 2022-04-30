@@ -15,14 +15,6 @@ export default function PlayerBoard({ state, dispatch, player }) {
     }
   };
 
-  const hitShip = (id) => {
-    if (state.player1.ships.has(id)) {
-      dispatch({ type: ACTION_TYPES.SET_BEATEN, id });
-    } else {
-      dispatch({ type: ACTION_TYPES.SET_PASS, id });
-    }
-  };
-
   return (
     <div className={setClass(isSetShipMode, "set-ships-mode")}>
       <h1> Player {player} </h1>
