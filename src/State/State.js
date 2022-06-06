@@ -5,7 +5,12 @@ export const defaultState = {
     beaten: new Set(),
     pass: new Set(),
   },
-  player2: {},
+  player2: {
+    isSetShipMode: false,
+    ships: new Set(),
+    beaten: new Set(),
+    pass: new Set(),
+  },
   turn: "player1",
 };
 

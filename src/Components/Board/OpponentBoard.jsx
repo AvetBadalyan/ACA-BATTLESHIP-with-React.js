@@ -2,11 +2,14 @@ import React from "react";
 import "../../App.css";
 import groupArray from "../../helpers/groupArray";
 import setClass, { setOpponentClass } from "../../helpers/setClass";
-import { ACTION_TYPES } from "../../State/State"; 
+import { ACTION_TYPES } from "../../State/State";
 
 export default function OpponentBoard({ state, dispatch, player }) {
+
+  const playerId = player === "player1" ? "player2" : "player1";
+
   const {
-    player1: { isSetShipMode, ships },
+    [playerId]: { isSetShipMode }
   } = state;
 
   const hitShip = (id) => {
@@ -23,8 +26,8 @@ export default function OpponentBoard({ state, dispatch, player }) {
       {groupArray().map((row) => (
         <div className="row">
           {row.map((square) => (
-            <div className="square" onClick={() => hitShip(square)}>
-              <div className={setOpponentClass(state.player1, square)}></div>
+            <div onClick={() => hitShip(square)} className="square">
+              <div className={setOpponentClass(state[playerId], square)}></div>
             </div>
           ))}
         </div>

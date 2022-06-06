@@ -1,16 +1,15 @@
 import React from "react";
 import "../../App.css";
+import { useGameContext } from "../../Context";
 import groupArray from "../../helpers/groupArray";
 import setClass, { setPlayerClass } from "../../helpers/setClass";
 import { ACTION_TYPES } from "../../State/State";
 
-export default function PlayerBoard({ state, dispatch, player }) {
-  const {
-    player1: { isSetShipMode, ships },
-  } = state;
+export default function PlayerBoard({ player }) {
+  const { state: { [player] : {isSetShipMode} }, state, dispatch } = useGameContext();
 
   const setShips = (id) => {
-    if (state.player1.isSetShipMode) {
+    if (isSetShipMode) {
       dispatch({ type: ACTION_TYPES.SET_SHIPS, square: id });
     }
   };
@@ -21,8 +20,8 @@ export default function PlayerBoard({ state, dispatch, player }) {
       {groupArray().map((row) => (
         <div className="row">
           {row.map((square) => (
-            <div className="square" onClick={() => setShips(square)}>
-              <div className={setPlayerClass(state.player1, square)}></div>
+            <div onClick={() => setShips(square)} className="square">
+              <div className={setPlayerClass(state[player], square)}></div>
             </div>
           ))}
         </div>
