@@ -4,9 +4,11 @@ import { ACTION_TYPES } from "../../State/State";
 import OpponentBoard from "../Board/OpponentBoard";
 import PlayerBoard from "../Board/PlayerBoard";
 
-
-export default function Player({playerId}) {
-  const {  dispatch } = useGameContext();
+export default function Player({ playerId }) {
+  const {
+    state: { turn, [playerId] : {ships} },
+    dispatch,
+  } = useGameContext();
 
   const opponentId = playerId === "player1" ? "player2" : "player1";
 
@@ -17,7 +19,8 @@ export default function Player({playerId}) {
   return (
     <div>
       <PlayerBoard playerId={playerId} />
-      <button onClick={setShipsMode}> Set Ships </button>
+      <button onClick={setShipsMode}>Set Ships</button>
+      <button disabled={ships.size !== 20}>Start Game</button>
       <OpponentBoard opponentId={opponentId} playerId={playerId} />
     </div>
   );

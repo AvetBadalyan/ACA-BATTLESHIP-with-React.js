@@ -6,12 +6,14 @@ import { ACTION_TYPES, defaultState, reducer } from "./State/State";
 
 function App() {
   return (
-    <Provider>
-      <div className="players">
-        <Player playerId="player1" />
-        <Player playerId="player2" />
-      </div>
-    </Provider>
+    <div className="game">
+      <Provider>
+        <div className="players">
+          <Player playerId="player1" />
+          <Player playerId="player2" />
+        </div>
+      </Provider>
+    </div>
   );
 }
 
