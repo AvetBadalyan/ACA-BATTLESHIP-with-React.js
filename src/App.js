@@ -8,9 +8,9 @@ import { ACTION_TYPES, defaultState, reducer } from "./State/State";
 function App() {
   const { state, dispatch } = useGameContext();
   useEffect(() => {
-    const { player1: { isReady: ready1 }, player2: { isReady: ready2 } } = state;
-    if (ready1 && ready2) {
-      dispatch( {type: ACTION_TYPES.START_GAME})
+    const {gameStart, player1: { isReady: ready1 }, player2: { isReady: ready2 } } = state;
+    if (ready1 && ready2 && !gameStart) {
+      dispatch({ type: ACTION_TYPES.START_GAME });
     }
 } , [state])
 

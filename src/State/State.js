@@ -71,7 +71,7 @@ export const reducer = (state, action) => {
     case ACTION_TYPES.SET_IS_READY: {
       return {
         ...state,
-        [action.playerID]: { ...state[action.playerID], isReady: true },
+        [action.playerId]: { ...state[action.playerId], isReady: true },
       };
     }
   }
