@@ -26,30 +26,33 @@ export const reducer = (state, action) => {
     case ACTION_TYPES.SET_SET_SHIPS_MODE: {
       return {
         ...state,
-        player1: {
-          ...state.player1,
-          isSetShipMode: !state.player1.isSetShipMode,
+        [action.playerId]: {
+          ...state[action.playerId],
+          isSetShipMode: !state[action.playerId].isSetShipMode,
         },
       };
     }
     case ACTION_TYPES.SET_SHIPS: {
-      let newShips = new Set([...state.player1.ships]);
+      let newShips = new Set([...state[action.playerId].ships]);
       if (newShips.has(action.square)) {
         newShips.delete(action.square);
       } else {
         newShips.add(action.square);
       }
-      return { ...state, player1: { ...state.player1, ships: newShips } };
+      return {
+        ...state,
+        [action.playerId]: { ...state[action.playerId], ships: newShips },
+      };
     }
     case ACTION_TYPES.SET_BEATEN: {
-      let newBeaten = new Set([...state.player1.beaten]);
+      let newBeaten = new Set([...state[action.opponentId].beaten]);
       newBeaten.add(action.id);
-      return { ...state, player1: { ...state.player1, beaten: newBeaten } };
+      return { ...state,[action.opponentId]: { ...state[action.opponentId], beaten: newBeaten } };
     }
     case ACTION_TYPES.SET_PASS: {
-      let newPass = new Set([...state.player1.pass]);
+      let newPass = new Set([...state[action.opponentId].pass]);
       newPass.add(action.id);
-      return { ...state, player1: { ...state.player1, pass: newPass } };
+      return { ...state,[action.opponentId]: { ...state[action.opponentId], pass: newPass } };
     }
   }
 };

@@ -16,7 +16,7 @@ export default function PlayerBoard({ playerId }) {
 
   const setShips = (id) => {
     if (isSetShipMode) {
-      dispatch({ type: ACTION_TYPES.SET_SHIPS, square: id });
+      dispatch({ type: ACTION_TYPES.SET_SHIPS, square: id, playerId });
     }
   };
 

@@ -11,14 +11,14 @@ export default function Player({playerId}) {
   const opponentId = playerId === "player1" ? "player2" : "player1";
 
   const setShipsMode = () => {
-    dispatch({ type: ACTION_TYPES.SET_SET_SHIPS_MODE });
+    dispatch({ type: ACTION_TYPES.SET_SET_SHIPS_MODE, playerId });
   };
 
   return (
     <div>
       <PlayerBoard playerId={playerId} />
       <button onClick={setShipsMode}> Set Ships </button>
-      <OpponentBoard playerId={opponentId} />
+      <OpponentBoard opponentId={opponentId} playerId={playerId} />
     </div>
   );
 }
