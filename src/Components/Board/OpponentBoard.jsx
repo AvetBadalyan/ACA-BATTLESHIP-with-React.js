@@ -22,7 +22,7 @@ export default function OpponentBoard({ playerId, opponentId }) {
 
   return (
     <div className={setClass(isSetShipMode, "set-ships-mode")}>
-      <h1 className="player2-header"> Player {opponentId} </h1>
+      <h1 className="player2-header">{opponentId} </h1>
       {groupArray().map((row) => (
         <div className="row">
           {row.map((square) => (

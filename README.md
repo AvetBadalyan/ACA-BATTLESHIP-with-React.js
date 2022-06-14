@@ -1,3 +1,9 @@
+# BATTLESHIP
+
+![welcome](./src/./assets/screenshot/welcome.jpg)
+![choose](./src/assets/screenshot/choose.jpg)
+![player](./src/assets/screenshot/player1.jpg)
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

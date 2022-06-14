@@ -22,7 +22,7 @@ export default function PlayerBoard({ playerId }) {
 
   return (
     <div className={setClass(isSetShipMode, "set-ships-mode")}>
-      <h1 className="player1-header"> Player {playerId} </h1>
+      <h1 className="player1-header"> {playerId} </h1>
       {groupArray().map((row) => (
         <div className="row">
           {row.map((square) => (
