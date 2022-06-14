@@ -5,8 +5,12 @@
 
 .game {
   width: 100vw;
-  height: auto;
+  height: 100vh;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+  background: url("./../../assets/battleship-wallpapers.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
 }

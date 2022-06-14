@@ -1,11 +1,11 @@
 import React from 'react';
 import { Provider, useGameContext } from '../../Context';
 import { useEffect } from 'react';
-import Player from './../../Components/Player/Player';
+import Player from '../../Components/Player/Player';
 import "./MainPage.css"
 import { ACTION_TYPES, defaultState, reducer } from "../../State/State";
 
-export default function MainPage() {
+export default function MainPage1() {
    const { state, dispatch } = useGameContext();
    useEffect(() => {
      const {
@@ -21,9 +21,8 @@ export default function MainPage() {
    return (
      <div className="game">
        <div className="players">
-         <h1> Turn {state.turn} </h1>
+         <h1 className="turn"> Turn {state.turn} </h1>
          <Player playerId="player1" />
-         <Player playerId="player2" />
        </div>
      </div>
    );
