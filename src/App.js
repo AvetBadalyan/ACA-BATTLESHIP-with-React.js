@@ -1,26 +1,21 @@
-import { useEffect } from "react";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
-import Player from "./Components/Player/Player";
-import { Provider, useGameContext } from "./Context";
+import ChoosePlayerPage from "./Pages/ChoosePlayerPage";
+import Welcome from './Pages/Welcome/Welcome';
+import MainPage from './Pages/MainPage/MainPage';
 
-import { ACTION_TYPES, defaultState, reducer } from "./State/State";
 
 function App() {
-  const { state, dispatch } = useGameContext();
-  useEffect(() => {
-    const {gameStart, player1: { isReady: ready1 }, player2: { isReady: ready2 } } = state;
-    if (ready1 && ready2 && !gameStart) {
-      dispatch({ type: ACTION_TYPES.START_GAME });
-    }
-} , [state])
-
   return (
-    <div className="game">
-      <div className="players">
-        <h1> Turn {state.turn} </h1>
-        <Player playerId="player1" />
-        <Player playerId="player2" />
-      </div>
+    <div className="App">
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Welcome />} />
+          <Route path="/players" element={<ChoosePlayerPage />} />
+          <Route path="/players/player1" element={<MainPage />} />
+          <Route path="/players/player2" element={<MainPage />} />
+        </Routes>
+      </BrowserRouter>
     </div>
   );
 }

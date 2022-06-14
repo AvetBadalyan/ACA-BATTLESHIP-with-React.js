@@ -53,3 +53,95 @@
   justify-content: center;
   align-items: center;
 }
+
+.App {
+  text-align: center;
+}
+
+header {
+  text-align: center;
+}
+
+h1 {
+  color: blue;
+  background-color: rgba(255, 255, 255, 0.5);
+  font-size: 90px;
+}
+
+.subtitle {
+  font-size: 30px;
+  color: blue;
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+h1,
+h2,
+p {
+  box-sizing: border-box;
+  margin: 10px;
+  padding: 10px;
+  text-transform: uppercase;
+}
+
+.player-button {
+  margin: 10px;
+  padding: 10px;
+  font-size: 20px;
+  font-weight: bolder;
+  font-style: oblique;
+  color: blue;
+  background-color: white;
+  cursor: pointer;
+}
+
+.player-button:hover {
+  color: white;
+  background-color: blue;
+  transform: scale(1.1);
+}
+
+.choose-player-page {
+  box-sizing: border-box;
+  padding: 10px;
+  height: 100vh;
+  width: 100vw;
+  background-image: url("./assets/uk_cruisers_key_art.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: scroll;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.choose-player-buttons {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+
+.player-1 {
+  width: 100vw;
+  height: 100vh;
+  background: url("./assets/battleship-wallpapers.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.player1-header {
+  color: blue;
+  background-color: rgba(255, 255, 255, 0.3);
+  font-size: 50px;
+}
+
+.two-boards {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.choose-ships {
+  display: flex;
+  flex-direction: column;
+}

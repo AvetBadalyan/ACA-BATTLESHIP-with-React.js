@@ -1,0 +1,77 @@
+.welcome-page {
+  height: 100vh;
+  width: 100vw;
+  background-image: url("./../../assets/bgjpg.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: scroll;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+}
+
+.title {
+  font-size: 80px;
+  text-transform: uppercase;
+  color: red;
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.player-tip {
+  border: 2px solid black;
+  margin: 10px;
+  padding: 10px;
+  text-transform:capitalize;
+  width: 60%;
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+  font-size: 28px;
+  font-weight: bolder;
+  font-style: italic;
+  color: blue;
+  background-color: rgba(255, 255, 255, 0.5);
+  word-wrap: break-word;
+}
+
+.play-button {
+  margin: 10px;
+  padding: 10px;
+  font-size: 20px;
+  font-weight: bolder;
+  font-style: oblique;
+  color: blue;
+  background-color: white;
+  cursor: pointer;
+
+}
+
+.play-button:hover {
+  color: white;
+  background-color: blue;
+  transform: scale(1.1);
+}
+
+
+header {
+  text-align: center;
+}
+
+h1 {
+  color: blue;
+  background-color: rgba(255, 255, 255, 0.5);
+  font-size: 90px;
+}
+
+.subtitle {
+  font-size: 30px;
+  color: blue;
+  background-color: rgba(255, 255, 255, 0.5);
+}
