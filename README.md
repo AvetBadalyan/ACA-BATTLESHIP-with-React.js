@@ -1,76 +1,179 @@
-# BATTLESHIP
+# 🚢 Battleship
 
-![welcome](./src/./assets/screenshot/welcome.jpg)
-![choose](./src/assets/screenshot/choose.jpg)
-![player](./src/assets/screenshot/player1.jpg)
+A modern, single-player Battleship game built with React 19, TypeScript, and
+Vite. Challenge yourself against an AI opponent with three difficulty levels!
 
-# Getting Started with Create React App
+![Battleship Game](./src/assets/screenshot/welcome.jpg)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## ✨ Features
 
-## Available Scripts
+### 🎮 Gameplay
 
-In the project directory, you can run:
+- **Single-player vs AI** - Battle against a computer opponent
+- **3 AI Difficulty Levels:**
+  - 🟢 **Easy** - Random shots (good for beginners)
+  - 🟡 **Medium** - Hunts adjacent cells after a hit
+  - 🔴 **Hard** - Probability-based targeting with intelligent hunting
+- **Standard Battleship Fleet:**
+  - Carrier (5 cells)
+  - Battleship (4 cells)
+  - Cruiser (3 cells)
+  - Submarine (3 cells)
+  - Destroyer (2 cells)
 
-### `npm start`
+### 🎨 Ship Placement
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- Click-to-place ships on the board
+- Rotate ships with **R key** or orientation button
+- **Randomize** button for quick placement
+- Visual preview showing valid/invalid positions
+- Clear button to reset placement
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+### 📊 Game Stats
 
-### `npm test`
+- Real-time tracking of shots fired, hits, and accuracy
+- Ships remaining/destroyed counter
+- Game timer
+- End-game stats comparison
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 🎵 Audio & Visual Effects
 
-### `npm run build`
+- Synthesized sound effects (Web Audio API - no files needed!)
+  - Explosion sounds for hits
+  - Splash sounds for misses
+  - Ship sinking audio
+  - Victory/defeat fanfares
+- Smooth animations with Framer Motion
+- Water ripple effects on cells
+- Hit/miss/sunk visual indicators
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### 🌓 UI/UX
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- **Dark/Light theme** toggle
+- **Responsive design** - works on desktop and mobile
+- Modern naval/military aesthetic
+- Accessible keyboard controls
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## 🛠️ Tech Stack
 
-### `npm run eject`
+- **React 19** - Latest React with modern features
+- **TypeScript** - Full type safety
+- **Vite** - Fast build tool and dev server
+- **Zustand** - Lightweight state management
+- **Framer Motion** - Smooth animations
+- **CSS Modules** - Scoped styling
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## 🚀 Getting Started
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Prerequisites
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+- Node.js 18+
+- npm or yarn
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+### Installation
 
-## Learn More
+```bash
+# Clone the repository
+git clone https://github.com/AvetBadalyan/ACA-BATTLESHIP-with-React.js.git
+cd game-front
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+# Install dependencies
+npm install
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+# Start development server
+npm run dev
+```
 
-### Code Splitting
+### Available Scripts
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+```bash
+npm run dev      # Start development server
+npm run build    # Build for production
+npm run preview  # Preview production build
+npm run lint     # Run ESLint
+```
 
-### Analyzing the Bundle Size
+## 🎯 How to Play
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+1. **Setup Phase:**
+   - Select a ship from the fleet panel
+   - Click on your board to place it
+   - Press `R` to rotate before placing
+   - Use "Randomize" for quick setup
+   - Click "Start Battle" when all ships are placed
 
-### Making a Progressive Web App
+2. **Battle Phase:**
+   - Click on enemy waters to fire
+   - Watch for hit 💥, miss 💨, or sunk 🔥 indicators
+   - The AI will take its turn automatically
+   - First to sink all enemy ships wins!
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+3. **Victory:**
+   - View end-game stats and accuracy
+   - Click "Play Again" for a rematch
 
-### Advanced Configuration
+## 📁 Project Structure
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+```
+src/
+├── components/       # React components
+│   ├── Board/       # Game board with cells
+│   ├── Cell/        # Individual cell with animations
+│   ├── ShipSelector/# Ship selection panel
+│   ├── GameStats/   # Stats display
+│   ├── Header/      # App header with controls
+│   ├── TurnIndicator/# Current turn display
+│   └── GameOverModal/# End game modal
+├── store/           # Zustand state management
+├── types/           # TypeScript type definitions
+├── utils/           # Game logic utilities
+│   ├── board.ts     # Board operations
+│   ├── ai.ts        # AI opponent logic
+│   └── sounds.ts    # Sound effects
+├── hooks/           # Custom React hooks
+└── styles/          # Global styles and CSS variables
+```
 
-### Deployment
+## 🤖 AI Difficulty Explained
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+### Easy Mode
 
-### `npm run build` fails to minify
+- Completely random targeting
+- No pattern recognition
+- Good for learning the game
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### Medium Mode
+
+- Hunt/Target algorithm
+- After a hit, tries adjacent cells
+- Continues in the hit direction when finding the ship orientation
+
+### Hard Mode
+
+- Probability density mapping
+- Calculates where ships are most likely to be
+- Prioritizes center cells (statistically better)
+- Smart hunting with direction detection
+
+## 🔮 Future Enhancements
+
+- [ ] Online multiplayer mode
+- [ ] Game replay/history
+- [ ] Custom board sizes
+- [ ] More ship configurations
+- [ ] Achievements/leaderboard
+- [ ] PWA support for offline play
+
+## 📝 License
+
+This project is open source and available under the [MIT License](LICENSE).
+
+## 👨‍💻 Author
+
+**Avet Badalyan**
+
+- GitHub: [@AvetBadalyan](https://github.com/AvetBadalyan)
+
+---
+
+Built with ❤️ and lots of ☕

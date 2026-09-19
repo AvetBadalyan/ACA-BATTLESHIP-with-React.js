@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="water" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a4a6e"/>
+      <stop offset="100%" style="stop-color:#0d2840"/>
+    </linearGradient>
+    <linearGradient id="ship" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#5a7a9a"/>
+      <stop offset="100%" style="stop-color:#3a5a7a"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="50" cy="50" r="48" fill="url(#water)" stroke="#00d4ff" stroke-width="2"/>
+  
+  <!-- Ship hull -->
+  <path d="M15 55 L25 65 L75 65 L85 55 L80 55 L75 60 L25 60 L20 55 Z" fill="url(#ship)" stroke="#6b8fc5" stroke-width="1"/>
+  
+  <!-- Ship deck -->
+  <rect x="30" y="48" width="40" height="7" rx="1" fill="#4a6a8a" stroke="#5a7a9a"/>
+  
+  <!-- Bridge/Tower -->
+  <rect x="42" y="35" width="16" height="13" rx="1" fill="#3a5a7a" stroke="#5a7a9a"/>
+  <rect x="46" y="28" width="8" height="7" rx="1" fill="#4a6a8a" stroke="#5a7a9a"/>
+  
+  <!-- Antenna -->
+  <line x1="50" y1="22" x2="50" y2="28" stroke="#00d4ff" stroke-width="2"/>
+  <circle cx="50" cy="20" r="2" fill="#00d4ff"/>
+  
+  <!-- Waves -->
+  <path d="M10 70 Q20 67 30 70 T50 70 T70 70 T90 70" fill="none" stroke="#00d4ff" stroke-width="1.5" opacity="0.6"/>
+  <path d="M5 76 Q17 73 30 76 T55 76 T80 76 T95 76" fill="none" stroke="#00d4ff" stroke-width="1" opacity="0.4"/>
+</svg>

@@ -1,0 +1,190 @@
+.cell {
+  width: var(--cell-size);
+  height: var(--cell-size);
+  background: linear-gradient(135deg, var(--ocean-light), var(--ocean-dark));
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  position: relative;
+  overflow: hidden;
+  transition: all var(--transition-fast);
+}
+
+.cell.clickable {
+  cursor: crosshair;
+}
+
+.cell.clickable:hover {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+
+.cell.disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Water animation */
+.water {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.wave {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.05) 25%,
+    transparent 50%,
+    rgba(255, 255, 255, 0.05) 75%,
+    transparent
+  );
+  animation: wave 3s linear infinite;
+}
+
+@keyframes wave {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* Ship cell */
+.cell.ship {
+  background: linear-gradient(135deg, var(--ship-color), #3a5a8a);
+  border-color: var(--ship-border);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.cell.ship::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+
+/* Preview states */
+.cell.previewValid {
+  background: linear-gradient(135deg, var(--success-color), #1fa855);
+  border-color: var(--success-color);
+  box-shadow: 0 0 15px rgba(46, 213, 115, 0.4);
+}
+
+.cell.previewInvalid {
+  background: linear-gradient(135deg, var(--error-color), #cc3344);
+  border-color: var(--error-color);
+  box-shadow: 0 0 15px rgba(255, 71, 87, 0.4);
+}
+
+/* Hit cell */
+.cell.hit {
+  background: linear-gradient(135deg, var(--hit-bg), #600000);
+  border-color: var(--hit-color);
+  box-shadow: 0 0 15px var(--hit-glow);
+}
+
+.hitMarker {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.explosion {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, var(--hit-color) 0%, transparent 70%);
+  animation: explosionPulse 1s ease-out forwards;
+}
+
+@keyframes explosionPulse {
+  0% {
+    opacity: 1;
+    transform: scale(0.5);
+  }
+  100% {
+    opacity: 0.3;
+    transform: scale(1.2);
+  }
+}
+
+.hitIcon {
+  font-size: 1.2rem;
+  z-index: 3;
+  filter: drop-shadow(0 0 4px var(--hit-color));
+}
+
+/* Miss cell */
+.cell.miss {
+  background: linear-gradient(135deg, var(--miss-bg), #1a2a3a);
+  border-color: var(--miss-color);
+}
+
+.missMarker {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.splash {
+  width: 60%;
+  height: 60%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: splashRipple 0.5s ease-out forwards;
+}
+
+@keyframes splashRipple {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+}
+
+/* Sunk cell */
+.cell.sunk {
+  background: linear-gradient(135deg, #4a0000, #2a0000);
+  border-color: var(--sunk-color);
+  box-shadow: 0 0 20px var(--sunk-glow);
+}
+
+.sunkMarker {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sunkIcon {
+  font-size: 1.4rem;
+  animation: sunkFlicker 0.5s ease-in-out infinite alternate;
+}
+
+@keyframes sunkFlicker {
+  0% {
+    opacity: 0.7;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}

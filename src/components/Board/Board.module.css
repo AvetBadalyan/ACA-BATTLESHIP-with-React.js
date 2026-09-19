@@ -1,0 +1,114 @@
+.boardContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.boardWrapper {
+  background: var(--bg-card);
+  padding: var(--board-padding);
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--border-color);
+  box-shadow: var(--shadow-lg);
+}
+
+.colLabels {
+  display: flex;
+  margin-bottom: 4px;
+}
+
+.cornerLabel {
+  width: 28px;
+  height: 24px;
+}
+
+.label {
+  width: var(--cell-size);
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin: 0 calc(var(--cell-gap) / 2);
+}
+
+.gridContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cell-gap);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--cell-gap);
+}
+
+.rowLabel {
+  width: 24px;
+  height: var(--cell-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-right: 4px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .title {
+    font-size: 1rem;
+  }
+  
+  .cornerLabel {
+    width: 24px;
+    height: 20px;
+  }
+  
+  .label {
+    height: 20px;
+    font-size: 0.65rem;
+  }
+  
+  .rowLabel {
+    width: 20px;
+    font-size: 0.65rem;
+    margin-right: 2px;
+  }
+}
+
+@media (max-width: 480px) {
+  .boardWrapper {
+    padding: 8px;
+  }
+  
+  .cornerLabel {
+    width: 20px;
+    height: 18px;
+  }
+  
+  .label {
+    height: 18px;
+    font-size: 0.6rem;
+  }
+  
+  .rowLabel {
+    width: 18px;
+    font-size: 0.6rem;
+  }
+}
