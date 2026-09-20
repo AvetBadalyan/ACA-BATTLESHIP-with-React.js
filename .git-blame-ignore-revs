@@ -1,0 +1,7 @@
+# Commits listed here are skipped by `git blame` (bulk/mechanical changes).
+# Configure locally with:
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+# GitHub applies this automatically.
+
+# style: apply Prettier formatting across codebase
+8a2ae577cf0046f816efb4adef929a27026833df
