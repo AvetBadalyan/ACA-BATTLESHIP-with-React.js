@@ -244,37 +244,22 @@ export interface GameState {
 // ============================================
 
 /**
- * AI hunting state for the Hunt/Target algorithm.
+ * AI state for the Hunt/Target approach.
  *
- * The AI operates as a state machine:
- * - HUNT mode: Searching randomly for ships
- * - TARGET mode: Found a hit, systematically destroying ship
+ * The AI hunts at random until it hits a ship, then queues the cells next
+ * to that hit and fires at those before hunting again.
  *
  * @example
- * // Initial state (hunting)
- * { mode: 'hunt', targetQueue: [], hitStack: [], lastHit: null, shipDirection: null }
+ * // Hunting (nothing queued)
+ * { targetQueue: [] }
  *
- * // After finding a hit
- * { mode: 'target', targetQueue: [{row:5,col:4}, {row:5,col:6}], hitStack: [{row:5,col:5}], ... }
- *
- * INTERVIEW TIP:
- * This is a classic example of the State Pattern. The AI's behavior
- * changes based on its current mode, and the mode transitions are
- * triggered by shot results.
+ * // After a hit, neighbours queued
+ * { targetQueue: [{row:5,col:4}, {row:5,col:6}] }
  */
 export interface AIHuntState {
-  /** Current AI mode */
+  /** 'hunt' = firing at random; 'target' = chasing a hit ship */
   mode: 'hunt' | 'target';
 
-  /** Queue of cells to try (adjacent to hits) */
+  /** Cells to try next (neighbours of previous hits), used as a FIFO queue */
   targetQueue: Position[];
-
-  /** Stack of consecutive hits (for direction detection) */
-  hitStack: Position[];
-
-  /** Most recent hit position */
-  lastHit: Position | null;
-
-  /** Detected ship orientation (after 2+ hits) */
-  shipDirection: 'horizontal' | 'vertical' | null;
 }
