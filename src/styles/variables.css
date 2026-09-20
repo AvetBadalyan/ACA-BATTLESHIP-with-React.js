@@ -149,9 +149,30 @@
   }
 }
 
+/* Mid-size phones (375-480px, e.g. iPhone 12-15): grow the board into
+   the available width. 30px cells stay well above the WCAG 2.2 AA
+   24px minimum touch target; a 10-wide grid can't reach the 44px HIG
+   ideal on any phone, so we maximise within the width budget. */
 @media (max-width: 480px) {
   :root {
-    --cell-size: 28px;
+    --cell-size: 30px;
     --board-padding: 8px;
+  }
+}
+
+/* Small phones (<=380px, e.g. 360/375): step down so the 10-wide board
+   plus row labels never overflows. */
+@media (max-width: 380px) {
+  :root {
+    --cell-size: 28px;
+  }
+}
+
+/* Very small phones (<=340px, e.g. 320px iPhone SE 1st gen): floor at
+   24px, the WCAG 2.2 AA minimum touch target. */
+@media (max-width: 340px) {
+  :root {
+    --cell-size: 24px;
+    --board-padding: 6px;
   }
 }
