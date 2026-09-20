@@ -15,14 +15,14 @@
  *   that rejection so it never crashes the game.
  */
 
-import clickUrl from '@/assets/sounds/click.wav';
-import defeatUrl from '@/assets/sounds/defeat.wav';
-import hitUrl from '@/assets/sounds/hit.wav';
-import missUrl from '@/assets/sounds/miss.wav';
-import placeUrl from '@/assets/sounds/place.wav';
-import rotateUrl from '@/assets/sounds/rotate.wav';
-import sunkUrl from '@/assets/sounds/sunk.wav';
-import victoryUrl from '@/assets/sounds/victory.wav';
+import clickUrl from '@/assets/sounds/click.mp3';
+import defeatUrl from '@/assets/sounds/defeat.mp3';
+import hitUrl from '@/assets/sounds/hit.mp3';
+import missUrl from '@/assets/sounds/miss.mp3';
+import placeUrl from '@/assets/sounds/place.mp3';
+import rotateUrl from '@/assets/sounds/rotate.mp3';
+import sunkUrl from '@/assets/sounds/sunk.mp3';
+import victoryUrl from '@/assets/sounds/victory.mp3';
 
 export type SoundName =
   'hit' | 'miss' | 'sunk' | 'victory' | 'defeat' | 'place' | 'rotate' | 'click';

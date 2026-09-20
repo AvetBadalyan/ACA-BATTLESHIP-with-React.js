@@ -363,7 +363,7 @@ cache-hashes them. `sounds.ts` keeps one `Audio` object per sound and a
 small `playSound` function:
 
 ```typescript
-import hitUrl from '@/assets/sounds/hit.wav';
+import hitUrl from '@/assets/sounds/hit.mp3';
 // ...one import per sound
 
 const sounds = { hit: new Audio(hitUrl) /* , ... */ };
