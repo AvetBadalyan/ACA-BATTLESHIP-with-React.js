@@ -55,14 +55,6 @@
   white-space: nowrap;
 }
 
-.difficulty {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  padding: 6px 12px;
-  background: var(--bg-tertiary);
-  border-radius: var(--radius-md);
-}
-
 .lastShot {
   font-size: 1.5rem;
   font-weight: 700;

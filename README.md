@@ -1,6 +1,6 @@
 # 🚢 Battleship
 
-A modern, single-player Battleship game built with React 19, TypeScript, and Vite. Challenge yourself against an AI opponent with three difficulty levels!
+A modern, single-player Battleship game built with React 19, TypeScript, and Vite. Challenge yourself against an AI opponent that uses the classic Hunt/Target targeting algorithm.
 
 <p align="center">
   <img src="./src/assets/screenshots/01-setup-initial.png" alt="Setup Phase" width="800" />
@@ -11,10 +11,9 @@ A modern, single-player Battleship game built with React 19, TypeScript, and Vit
 ### 🎮 Gameplay
 
 - **Single-player vs AI** - Battle against a computer opponent
-- **3 AI Difficulty Levels:**
-  - 🟢 **Easy** - Random shots (good for beginners)
-  - 🟡 **Medium** - Hunts adjacent cells after a hit
-  - 🔴 **Hard** - Probability-based targeting with intelligent hunting
+- **Hunt/Target AI** - Fires randomly until it lands a hit, then
+  systematically targets adjacent cells to sink the ship before
+  resuming the search
 - **Standard Battleship Fleet:**
   - Carrier (5 cells)
   - Battleship (4 cells)
@@ -185,34 +184,26 @@ User Action → Component → Store Action → Utility Function → State Update
 | Pattern           | Usage                                |
 | ----------------- | ------------------------------------ |
 | **Immutability**  | All state updates create new objects |
-| **State Machine** | Game phases and AI modes             |
+| **State Machine** | Game phases and AI hunt/target modes |
 | **Factory**       | Object creation functions            |
-| **Strategy**      | AI difficulty algorithms             |
 | **Singleton**     | Sound manager instance               |
 
 ---
 
-## 🤖 AI Algorithms Explained
+## 🤖 AI Algorithm Explained
 
-### Easy Mode: Random Targeting
+The AI uses the classic **Hunt/Target** algorithm, implemented as a two-mode
+state machine:
 
-- Picks a random untried cell
-- No memory of previous shots
-- **~95 shots** to win on average
+- **Hunt mode**: fire at a random untried cell until something is hit
+- **Target mode**: on a hit, queue the four adjacent cells and fire at them
+  in turn to sink the ship
+- **Direction detection**: after two in-line hits, the AI infers whether the
+  ship is horizontal or vertical and prioritizes that direction
+- On sinking a ship, it clears its queue and returns to hunt mode
 
-### Medium Mode: Hunt/Target
-
-- **Hunt**: Fire randomly until hit
-- **Target**: After hit, try adjacent cells
-- Detects ship direction after 2+ hits
-- **~65 shots** to win on average
-
-### Hard Mode: Probability Density
-
-- Calculates probability for each cell
-- More possible ship placements = higher probability
-- Adds bonus for center cells
-- **~42 shots** to win on average
+This is meaningfully smarter than random guessing (it finishes ships it
+finds) while staying simple enough to reason about and explain.
 
 ---
 
@@ -250,22 +241,21 @@ For a game with frequent state updates (every shot), performance is critical.
 </details>
 
 <details>
-<summary><strong>Q: Explain how the AI difficulty levels work.</strong></summary>
+<summary><strong>Q: How does the AI decide where to shoot?</strong></summary>
 
-**Easy**: Pure random targeting. O(n²) to collect untried cells, O(1) to pick one.
+It uses the **Hunt/Target** algorithm, a two-mode state machine:
 
-**Medium**: Hunt/Target algorithm using a state machine:
+- **Hunt mode**: fire at a random untried cell. O(n²) to gather untried
+  cells, O(1) to pick one.
+- **Target mode**: once a cell is hit, its neighbors are pushed onto a FIFO
+  queue. The AI drains that queue, firing at each valid neighbor, so it
+  finishes off any ship it finds instead of wandering off.
+- **Direction detection**: after two in-line hits it infers the ship's
+  orientation and sorts the queue to try that direction first.
+- On a sink, it clears the queue and returns to hunt mode.
 
-- Hunt mode: Random shots until a hit
-- Target mode: Queue adjacent cells, try them systematically
-- Back to hunt after sinking a ship
-
-**Hard**: Probability density mapping:
-
-1. For each remaining ship, count all valid placements
-2. Each cell's probability = number of placements that cover it
-3. Add bonus for center cells (statistically better)
-4. Fire at highest probability cell
+The state (`mode`, `targetQueue`, `hitStack`, `shipDirection`) lives in an
+`AIHuntState` object that's updated immutably after every shot.
 
 </details>
 
@@ -338,20 +328,19 @@ class RemoteOpponent implements Opponent {
 </details>
 
 <details>
-<summary><strong>Q: What's the time complexity of the Hard AI?</strong></summary>
+<summary><strong>Q: What's the time complexity of the AI's move?</strong></summary>
 
-**O(n² × k)** where:
+Each turn is at most **O(n²)** where n = board size (10):
 
-- n = board size (10)
-- k = sum of remaining ship sizes (max 17)
+- **Target mode**: dequeuing a cell is O(1); the queue never holds more than
+  a handful of neighbors.
+- **Hunt mode**: gathering untried cells scans the board once, O(n²), then
+  picks one at random in O(1).
 
-For each ship:
+So a move is ~100 operations in the worst case — trivial for the browser.
+Updating the hunt state after a shot is also O(1) aside from a small sort of
+the neighbor queue.
 
-- Try all horizontal placements: O(n × (n - size))
-- Try all vertical placements: O((n - size) × n)
-- For each valid placement, increment probability of `size` cells
-
-Worst case: ~10 × 10 × 17 = 1,700 operations per shot. Negligible for modern browsers.
 </details>
 
 ### Code Reading Guide

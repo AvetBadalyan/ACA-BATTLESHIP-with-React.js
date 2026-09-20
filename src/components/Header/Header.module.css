@@ -44,41 +44,6 @@
   gap: 16px;
 }
 
-.difficultySelect {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.label {
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.select {
-  padding: 8px 12px;
-  font-size: 0.9rem;
-  font-family: inherit;
-  background: var(--bg-tertiary);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.select:hover {
-  border-color: var(--accent-primary);
-}
-
-.select:focus {
-  outline: none;
-  border-color: var(--accent-primary);
-  box-shadow: 0 0 0 2px var(--accent-glow);
-}
-
 .iconButton {
   width: 44px;
   height: 44px;
@@ -121,21 +86,6 @@
 
   .controls {
     gap: 8px;
-  }
-
-  .difficultySelect {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
-  }
-
-  .label {
-    font-size: 0.7rem;
-  }
-
-  .select {
-    padding: 6px 10px;
-    font-size: 0.85rem;
   }
 
   .iconButton {

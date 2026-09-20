@@ -38,15 +38,6 @@ export type CellState = 'empty' | 'ship' | 'hit' | 'miss' | 'sunk';
 export type Orientation = 'horizontal' | 'vertical';
 
 /**
- * AI difficulty levels.
- *
- * - easy: Random targeting (~95 shots to win)
- * - medium: Hunt/Target algorithm (~65 shots)
- * - hard: Probability-based (~42 shots)
- */
-export type Difficulty = 'easy' | 'medium' | 'hard';
-
-/**
  * Game phases - controls UI and allowed actions.
  *
  * setup → playing (when Start Game clicked)
@@ -224,7 +215,6 @@ export interface GameStats {
 export interface GameState {
   // ----- Game Flow -----
   phase: GamePhase;
-  difficulty: Difficulty;
   currentTurn: Player;
   winner: Player | null;
 
@@ -254,7 +244,7 @@ export interface GameState {
 // ============================================
 
 /**
- * AI hunting state for medium/hard difficulty.
+ * AI hunting state for the Hunt/Target algorithm.
  *
  * The AI operates as a state machine:
  * - HUNT mode: Searching randomly for ships

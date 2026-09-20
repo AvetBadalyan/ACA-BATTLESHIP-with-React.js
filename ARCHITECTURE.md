@@ -153,74 +153,41 @@ When a player clicks a cell to shoot:
        └── No → Switch to AI turn
 ```
 
-## 🤖 AI Algorithm Comparison
+## 🤖 AI Algorithm: Hunt/Target
 
-### Easy Mode: Random
-
-```
-algorithm EasyAI(board):
-    available = getAllUntriedCells(board)
-    return randomChoice(available)
-
-Characteristics:
-- O(n²) to collect cells, O(1) to pick
-- No memory of previous shots
-- ~95 shots to win on average
-```
-
-### Medium Mode: Hunt/Target
+The AI is a two-mode state machine. It hunts randomly until it hits a ship,
+then targets that ship's neighbors until it sinks.
 
 ```
-algorithm MediumAI(board, state):
-    if state.mode == 'target' AND state.queue not empty:
-        return state.queue.dequeue()
+getAIShot(board, state):
+    // TARGET MODE: work through neighbors of previous hits
+    while state.targetQueue not empty:
+        target = state.targetQueue.dequeue()   // FIFO
+        if target not already shot:
+            return target
 
-    // Hunt mode: random shot
-    position = randomUntriedCell(board)
-    return position
-
-onHit(position):
-    state.mode = 'target'
-    state.queue.enqueue(adjacentCells(position))
-
-onSunk():
+    // HUNT MODE: nothing queued, fire at a random untried cell
     state.mode = 'hunt'
-    state.queue.clear()
+    return randomUntriedCell(board)
+
+updateAIHuntState(state, position, result, board):
+    on hit:
+        state.mode = 'target'
+        state.hitStack.push(position)
+        enqueue valid, un-shot neighbors of position
+        if 2+ in-line hits: detect direction, sort queue that way
+    on sunk:
+        clear queue + hitStack, state.mode = 'hunt'
+    on miss:
+        keep state unchanged
+```
 
 Characteristics:
-- Uses queue for systematic targeting
-- Remembers hit locations
-- ~65 shots to win on average
-```
 
-### Hard Mode: Probability Density
-
-```
-algorithm HardAI(board, remainingShips):
-    if state.mode == 'target' AND state.queue not empty:
-        return state.queue.dequeue()
-
-    // Calculate probability for each cell
-    probMap = initializeZeros(10, 10)
-
-    for each ship in remainingShips:
-        for each possible placement:
-            if placement is valid:
-                for each cell in placement:
-                    probMap[cell] += 1
-
-    // Add center bonus
-    for each cell:
-        probMap[cell] += centerBonus(cell)
-
-    // Pick highest probability cell
-    return argmax(probMap)
-
-Characteristics:
-- O(n² × k) where k = total ship cells
-- Statistically optimal targeting
-- ~42 shots to win on average
-```
+- Uses a FIFO queue for systematic targeting
+- Remembers hit locations and infers ship orientation
+- Move selection is O(n²) worst case (hunt-mode scan); state update is O(1)
+  aside from a small neighbor-queue sort
 
 ## 📊 State Structure
 
@@ -228,7 +195,6 @@ Characteristics:
 GameState {
   // Game flow
   phase: 'setup' | 'playing' | 'gameOver'
-  difficulty: 'easy' | 'medium' | 'hard'
   currentTurn: 'player' | 'ai'
   winner: 'player' | 'ai' | null
 
@@ -292,18 +258,17 @@ function createEmptyStats(): GameStats { ... }
 function createAIHuntState(): AIHuntState { ... }
 ```
 
-### 4. **Strategy Pattern**
+### 4. **State Machine (AI)**
 
-AI difficulty selects different algorithms at runtime:
+The AI's behavior is driven by its current mode, which transitions based on
+shot results:
 
 ```typescript
-function getAIShot(board, difficulty, ...) {
-  switch (difficulty) {
-    case 'easy': return getEasyShot(board);
-    case 'medium': return getMediumShot(board, state);
-    case 'hard': return getHardShot(board, state, ships);
-  }
-}
+// getAIShot reads the mode; updateAIHuntState transitions it
+'hunt'  --(on hit)--> 'target'
+'target' --(on sunk)--> 'hunt'
+// In target mode it drains a queue of neighbor cells; in hunt mode
+// it fires at a random untried cell.
 ```
 
 ### 5. **Singleton Pattern**
@@ -333,7 +298,7 @@ const { phase, playerBoard } = useGameStore();
 | `Cell`          | Render single cell, animations for hit/miss/sunk |
 | `ShipSelector`  | Ship selection UI, orientation toggle, randomize |
 | `GameStats`     | Display shots, accuracy, ships remaining         |
-| `Header`        | Difficulty select, sound/theme toggles           |
+| `Header`        | Sound and theme toggles                          |
 | `TurnIndicator` | Show current turn, last shot result              |
 | `GameOverModal` | Victory/defeat display, play again button        |
 
@@ -449,9 +414,9 @@ interface GameHistory {
 
 > Zustand is simpler (no boilerplate), more performant (partial subscriptions), and doesn't require Provider wrappers. For a game with frequent state updates, this efficiency matters.
 
-**Q: Explain the AI difficulty levels.**
+**Q: How does the AI work?**
 
-> Easy uses random targeting. Medium uses Hunt/Target algorithm - random until hit, then targets adjacent cells. Hard uses probability density mapping - calculates where ships are most likely based on remaining possibilities.
+> It's a Hunt/Target state machine. In hunt mode it fires at random untried cells; once it hits, it switches to target mode and works through a queue of the hit's neighbors until the ship sinks, then goes back to hunting. After two in-line hits it infers the ship's orientation and tries that direction first.
 
 **Q: How is state managed immutably?**
 

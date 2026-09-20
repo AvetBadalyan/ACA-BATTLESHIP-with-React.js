@@ -3,8 +3,7 @@ import { motion } from 'framer-motion';
 import styles from './Header.module.css';
 
 export function Header() {
-  const { soundEnabled, theme, toggleSound, toggleTheme, difficulty, setDifficulty, phase } =
-    useGameStore();
+  const { soundEnabled, theme, toggleSound, toggleTheme } = useGameStore();
 
   return (
     <motion.header
@@ -19,24 +18,6 @@ export function Header() {
       </div>
 
       <div className={styles.controls}>
-        {phase === 'setup' && (
-          <div className={styles.difficultySelect}>
-            <label htmlFor="difficulty-select" className={styles.label}>
-              AI Difficulty:
-            </label>
-            <select
-              id="difficulty-select"
-              value={difficulty}
-              onChange={(e) => setDifficulty(e.target.value as 'easy' | 'medium' | 'hard')}
-              className={styles.select}
-            >
-              <option value="easy">Easy</option>
-              <option value="medium">Medium</option>
-              <option value="hard">Hard</option>
-            </select>
-          </div>
-        )}
-
         <button
           className={styles.iconButton}
           onClick={toggleSound}

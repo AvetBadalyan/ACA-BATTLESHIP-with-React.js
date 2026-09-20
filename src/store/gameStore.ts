@@ -32,15 +32,7 @@
  * User Action → Action Function → State Update → React Re-render
  */
 
-import {
-  AIHuntState,
-  Difficulty,
-  GameState,
-  GameStats,
-  Position,
-  SHIP_TYPES,
-  ShipType,
-} from '@/types';
+import { AIHuntState, GameState, GameStats, Position, SHIP_TYPES, ShipType } from '@/types';
 import { createAIHuntState, getAIShot, updateAIHuntState } from '@/utils/ai';
 import {
   areAllShipsSunk,
@@ -87,9 +79,6 @@ interface GameStore extends GameState {
 
   // ========== ACTIONS ==========
   // Each action is a function that updates state
-
-  /** Set AI difficulty level (only during setup) */
-  setDifficulty: (difficulty: Difficulty) => void;
 
   /** Select a ship for placement */
   selectShip: (ship: ShipType | null) => void;
@@ -162,12 +151,6 @@ export const useGameStore = create<GameStore>()(
       phase: 'setup',
 
       /**
-       * AI difficulty: 'easy' | 'medium' | 'hard'
-       * Affects AI targeting algorithm
-       */
-      difficulty: 'medium',
-
-      /**
        * Current turn: 'player' | 'ai'
        * Determines who can act
        */
@@ -204,14 +187,6 @@ export const useGameStore = create<GameStore>()(
       // ==========================================
       // ACTIONS
       // ==========================================
-
-      /**
-       * Sets the AI difficulty level.
-       * Only callable during setup phase.
-       *
-       * @param {Difficulty} difficulty - 'easy', 'medium', or 'hard'
-       */
-      setDifficulty: (difficulty) => set({ difficulty }),
 
       /**
        * Selects a ship for placement.
@@ -452,13 +427,12 @@ export const useGameStore = create<GameStore>()(
        * AI takes its turn.
        *
        * LOGIC:
-       * 1. Get remaining ship sizes (for Hard AI)
-       * 2. Call AI algorithm to get target position
-       * 3. Process the shot on player's board
-       * 4. Update AI hunt state based on result
-       * 5. Update stats
-       * 6. Check win condition
-       * 7. Switch back to player turn (or end game)
+       * 1. Call the AI (Hunt/Target) to get the target position
+       * 2. Process the shot on player's board
+       * 3. Update AI hunt state based on result
+       * 4. Update stats
+       * 5. Check win condition
+       * 6. Switch back to player turn (or end game)
        *
        * INTERVIEW TIP:
        * The AI turn is triggered by useEffect in App.tsx
@@ -469,16 +443,8 @@ export const useGameStore = create<GameStore>()(
         const state = get();
         if (state.phase !== 'playing' || state.currentTurn !== 'ai') return;
 
-        // Get sizes of player's remaining (unsunk) ships for Hard AI
-        const remainingShipSizes = state.playerShips.filter((s) => !s.isSunk).map((s) => s.size);
-
-        // Get AI's target position
-        const { position, newState } = getAIShot(
-          state.playerBoard,
-          state.difficulty,
-          state.aiHuntState,
-          remainingShipSizes
-        );
+        // Get AI's target position (Hunt/Target algorithm)
+        const { position, newState } = getAIShot(state.playerBoard, state.aiHuntState);
 
         // Process the shot
         const { board, ships, result } = processShot(
@@ -590,7 +556,6 @@ export const useGameStore = create<GameStore>()(
         // Only persist settings, not game state
         soundEnabled: state.soundEnabled,
         theme: state.theme,
-        difficulty: state.difficulty,
       }),
     }
   )

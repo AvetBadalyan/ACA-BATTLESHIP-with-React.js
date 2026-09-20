@@ -1,42 +1,36 @@
 /**
  * @fileoverview AI Opponent Logic for Battleship Game
  *
- * This module implements three difficulty levels of AI opponents:
- * - Easy: Random targeting
- * - Medium: Hunt/Target algorithm
- * - Hard: Probability density mapping
+ * The AI uses the classic Hunt/Target algorithm:
+ * - Hunt mode: fire at random untried cells until something is hit
+ * - Target mode: after a hit, systematically fire at adjacent cells
+ *   until the ship is sunk, then return to hunting
  *
  * @module utils/ai
  *
  * INTERVIEW NOTES:
  * ================
- * This module demonstrates several important CS concepts:
+ * This module demonstrates a few core concepts:
  *
- * 1. ALGORITHM DESIGN: Three different approaches to the same problem
- *    - Brute force (Easy)
- *    - Heuristic-based (Medium)  
- *    - Probabilistic (Hard)
+ * 1. STATE MACHINE: The AI switches between two modes ('hunt' and
+ *    'target') based on the result of its previous shots.
  *
- * 2. STATE MACHINE: The Hunt/Target mode switching
- *    - Hunt mode: searching randomly
- *    - Target mode: exploiting found ships
+ * 2. QUEUE-BASED SEARCH: When a hit occurs, adjacent cells are pushed
+ *    onto a target queue and processed FIFO until the ship is gone.
  *
- * 3. PROBABILITY: Density mapping calculates where ships COULD be
- *    - More possible placements = higher probability
- *    - Center cells naturally have higher probability
- *
- * 4. DATA STRUCTURES: Using arrays as stacks/queues for targeting
+ * 3. IMMUTABILITY: Each turn returns a NEW hunt-state object rather
+ *    than mutating the previous one, matching the store's data flow.
  */
 
-import { AIHuntState, Board, Difficulty, Position } from '@/types';
-import { BOARD_SIZE, getUntriedCells, isCellShot, isValidPosition } from './board';
+import { AIHuntState, Board, Position } from '@/types';
+import { getUntriedCells, isCellShot, isValidPosition } from './board';
 
 /**
- * Creates the initial state for AI hunting algorithm.
+ * Creates the initial state for the AI hunting algorithm.
  *
- * The AI uses a state machine with two modes:
- * - 'hunt': Searching for ships (random or probability-based)
- * - 'target': Found a ship, systematically destroying it
+ * The AI operates as a state machine with two modes:
+ * - 'hunt': searching for ships (random shots)
+ * - 'target': found a ship, systematically destroying it
  *
  * @returns {AIHuntState} Initial hunt state
  *
@@ -66,7 +60,7 @@ export function createAIHuntState(): AIHuntState {
  * // Returns: [{row:4,col:5}, {row:6,col:5}, {row:5,col:4}, {row:5,col:6}]
  *
  * getAdjacentCells({row: 0, col: 0})
- * // Returns: [{row:1,col:0}, {row:0,col:1}] // Corners filtered out
+ * // Returns: [{row:1,col:0}, {row:0,col:1}] // Out-of-bounds filtered out
  *
  * INTERVIEW TIP:
  * This is a common pattern in grid-based algorithms (BFS, flood fill, etc.)
@@ -83,93 +77,84 @@ function getAdjacentCells(pos: Position): Position[] {
 }
 
 /**
- * EASY AI: Pure random targeting.
- *
- * Simply picks a random cell from all untried positions.
+ * Picks a random untried cell. Used in hunt mode when there are no
+ * queued targets to follow up on.
  *
  * @param {Board} board - Current board state
  * @returns {Position} Random untried position
  *
  * INTERVIEW TIP:
- * This is O(n²) to collect untried cells, then O(1) to pick randomly.
- * A naive player would use this strategy. It's predictable and can
- * be beaten with good ship placement (corners, edges).
- *
- * Expected shots to win: ~95 shots (given 17 ship cells on 100 cell board)
+ * O(n²) to collect untried cells, then O(1) to pick one at random.
  */
-function getEasyShot(board: Board): Position {
+function getRandomShot(board: Board): Position {
   const available = getUntriedCells(board);
   return available[Math.floor(Math.random() * available.length)];
 }
 
 /**
- * MEDIUM AI: Hunt/Target Algorithm
- *
- * This is a classic Battleship algorithm:
- *
- * HUNT MODE:
- * - Fire randomly until we hit something
- * - Upon hit, switch to TARGET mode
+ * Selects the AI's next shot using the Hunt/Target algorithm.
  *
  * TARGET MODE:
- * - Add adjacent cells to target queue
- * - Process queue until ship is sunk
- * - After sinking, return to HUNT mode
+ * - Work through the queue of cells adjacent to previous hits.
+ * - Skip any that were already shot, fire at the first valid one.
  *
- * @param {Board} board - Current board state
+ * HUNT MODE:
+ * - If the target queue is empty, fire at a random untried cell.
+ *
+ * @param {Board} board - Player's board (what the AI shoots at)
  * @param {AIHuntState} huntState - Current AI state
  * @returns {{ position: Position; newState: AIHuntState }}
  *
  * INTERVIEW TIP:
- * This uses a Queue (FIFO) for targets. When we hit, we add
- * all 4 adjacent cells. We try them in order until:
- * - We find another hit (add more adjacents)
- * - Ship sinks (clear queue, back to hunt)
- * - All targets exhausted (back to hunt)
+ * The target queue is a FIFO queue. When the AI hits a ship, its
+ * neighbors get queued (see updateAIHuntState). The AI drains that
+ * queue before going back to random hunting, which is what makes it
+ * meaningfully better than pure random guessing.
  *
- * Expected shots to win: ~65 shots (significantly better than random)
+ * Usage flow each turn:
+ * 1. Call getAIShot() to choose a position to fire at.
+ * 2. Process the shot with processShot().
+ * 3. Call updateAIHuntState() with the result to update the queue.
  */
-function getMediumShot(
+export function getAIShot(
   board: Board,
   huntState: AIHuntState
 ): { position: Position; newState: AIHuntState } {
-  const newState = { ...huntState };
+  const newState = { ...huntState, targetQueue: [...huntState.targetQueue] };
 
-  // TARGET MODE: Process the queue of suspected ship cells
+  // TARGET MODE: work through cells adjacent to earlier hits.
   while (newState.targetQueue.length > 0) {
-    const target = newState.targetQueue.shift()!; // Dequeue (FIFO)
+    const target = newState.targetQueue.shift()!; // dequeue (FIFO)
     if (!isCellShot(board, target)) {
       return { position: target, newState };
     }
-    // If already shot, continue to next target
+    // Already shot -> discard and try the next queued target.
   }
 
-  // HUNT MODE: No targets in queue, fire randomly
+  // HUNT MODE: nothing queued, fire at a random untried cell.
   newState.mode = 'hunt';
   newState.lastHit = null;
   newState.shipDirection = null;
 
-  const position = getEasyShot(board);
-  return { position, newState };
+  return { position: getRandomShot(board), newState };
 }
 
 /**
- * Updates AI hunt state after receiving shot result.
+ * Updates AI hunt state after receiving a shot result.
  *
  * This function is called AFTER a shot to update the AI's knowledge:
  *
  * ON HIT:
  * - Switch to target mode
- * - Add hit to stack (for direction detection)
+ * - Add the hit to the stack (for direction detection)
  * - Queue adjacent cells for targeting
- * - If 2+ hits in a line, prioritize that direction
+ * - If 2+ hits fall in a line, prioritize that direction
  *
  * ON SUNK:
- * - Clear all targeting state
- * - Return to hunt mode
+ * - Clear all targeting state and return to hunt mode
  *
  * ON MISS:
- * - Keep current state (continue targeting if in target mode)
+ * - Keep the current state (continue targeting if in target mode)
  *
  * @param {AIHuntState} state - Current AI state
  * @param {Position} position - Position that was shot
@@ -178,10 +163,9 @@ function getMediumShot(
  * @returns {AIHuntState} New AI state
  *
  * INTERVIEW TIP:
- * This demonstrates the Observer Pattern - the AI observes the
- * result of its action and updates internal state accordingly.
- * The direction detection is a simple heuristic: if two hits
- * share a row, ship is horizontal; if they share a column, vertical.
+ * The direction detection is a simple heuristic: if two hits share a
+ * row, the ship is horizontal; if they share a column, it's vertical.
+ * We then sort the queue so cells along that direction are tried first.
  */
 export function updateAIHuntState(
   state: AIHuntState,
@@ -189,7 +173,7 @@ export function updateAIHuntState(
   result: 'hit' | 'miss' | 'sunk',
   board: Board
 ): AIHuntState {
-  // Create mutable copy of state
+  // Create a mutable copy of state (arrays copied too).
   const newState = {
     ...state,
     targetQueue: [...state.targetQueue],
@@ -201,7 +185,7 @@ export function updateAIHuntState(
     newState.mode = 'target';
     newState.hitStack.push(position);
 
-    // Add adjacent cells to target queue (if not already shot or queued)
+    // Queue adjacent cells (skip ones already shot or already queued).
     const adjacent = getAdjacentCells(position);
     for (const adj of adjacent) {
       const alreadyQueued = newState.targetQueue.some(
@@ -212,24 +196,22 @@ export function updateAIHuntState(
       }
     }
 
-    // Direction detection: if we have 2+ hits, determine ship orientation
+    // Direction detection: with 2+ hits we can guess ship orientation.
     if (newState.hitStack.length >= 2) {
       const last = newState.hitStack[newState.hitStack.length - 1];
       const prev = newState.hitStack[newState.hitStack.length - 2];
 
       if (last.row === prev.row) {
-        // Same row = horizontal ship
+        // Same row = horizontal ship; try horizontal targets first.
         newState.shipDirection = 'horizontal';
-        // Prioritize horizontal targets (sort them to front of queue)
         newState.targetQueue.sort((a, b) => {
           const aHoriz = a.row === last.row ? 0 : 1;
           const bHoriz = b.row === last.row ? 0 : 1;
           return aHoriz - bHoriz;
         });
       } else if (last.col === prev.col) {
-        // Same column = vertical ship
+        // Same column = vertical ship; try vertical targets first.
         newState.shipDirection = 'vertical';
-        // Prioritize vertical targets
         newState.targetQueue.sort((a, b) => {
           const aVert = a.col === last.col ? 0 : 1;
           const bVert = b.col === last.col ? 0 : 1;
@@ -241,248 +223,14 @@ export function updateAIHuntState(
     newState.lastHit = position;
   } else if (result === 'sunk') {
     // === SUNK LOGIC ===
-    // Ship destroyed! Clear all targeting state and go back to hunting
+    // Ship destroyed! Clear targeting state and go back to hunting.
     newState.mode = 'hunt';
     newState.hitStack = [];
     newState.targetQueue = [];
     newState.lastHit = null;
     newState.shipDirection = null;
   }
-  // On miss: keep current state unchanged
+  // On miss: keep current state unchanged.
 
   return newState;
-}
-
-/**
- * HARD AI: Probability Density Mapping
- *
- * The most sophisticated AI uses probability to determine the best shot.
- *
- * Algorithm:
- * 1. For each remaining ship, calculate all possible placements
- * 2. For each valid placement, increment probability of those cells
- * 3. Cells with more possible ship placements = higher probability
- * 4. Add bonus for center cells (statistically better)
- * 5. Pick from highest probability cells
- *
- * Combined with Hunt/Target mode for efficient ship destruction.
- *
- * @param {Board} board - Current board state
- * @param {AIHuntState} huntState - Current AI state
- * @param {number[]} remainingShipSizes - Sizes of ships not yet sunk
- * @returns {{ position: Position; newState: AIHuntState }}
- *
- * INTERVIEW TIP:
- * This is a Monte Carlo-like approach. The probability map represents
- * the expected value of shooting each cell. It's O(n² * k) where
- * n = BOARD_SIZE and k = sum of remaining ship sizes.
- *
- * Expected shots to win: ~42 shots (optimal human-like play)
- */
-function getHardShot(
-  board: Board,
-  huntState: AIHuntState,
-  remainingShipSizes: number[]
-): { position: Position; newState: AIHuntState } {
-  const newState = { ...huntState, targetQueue: [...huntState.targetQueue] };
-
-  // If in target mode with valid targets, use them first
-  if (newState.mode === 'target' && newState.targetQueue.length > 0) {
-    while (newState.targetQueue.length > 0) {
-      const target = newState.targetQueue.shift()!;
-      if (!isCellShot(board, target)) {
-        return { position: target, newState };
-      }
-    }
-    // All targets exhausted
-    newState.mode = 'hunt';
-    newState.shipDirection = null;
-  }
-
-  // HUNT MODE: Use probability density mapping
-  const probabilities = calculateProbabilityMap(board, remainingShipSizes);
-
-  // Find maximum probability value
-  let maxProb = 0;
-  let candidates: Position[] = [];
-
-  for (let row = 0; row < BOARD_SIZE; row++) {
-    for (let col = 0; col < BOARD_SIZE; col++) {
-      if (probabilities[row][col] > maxProb) {
-        maxProb = probabilities[row][col];
-        candidates = [{ row, col }];
-      } else if (probabilities[row][col] === maxProb && maxProb > 0) {
-        candidates.push({ row, col });
-      }
-    }
-  }
-
-  // Pick randomly from highest probability cells (breaks ties)
-  const position = candidates[Math.floor(Math.random() * candidates.length)];
-  return { position, newState };
-}
-
-/**
- * Calculates the probability density map for the board.
- *
- * For each cell, counts how many ways remaining ships could
- * be placed such that they cover that cell.
- *
- * @param {Board} board - Current board state
- * @param {number[]} shipSizes - Sizes of remaining (unsunk) ships
- * @returns {number[][]} 10x10 probability map
- *
- * INTERVIEW TIP:
- * This is the key insight of the Hard AI. Consider a 5-cell Carrier:
- * - Center cell (5,5) can be covered by 10 different placements
- * - Corner cell (0,0) can only be covered by 2 placements
- * Therefore, center cells are statistically more likely to contain ships.
- *
- * The algorithm:
- * 1. Try every possible ship placement (start position + orientation)
- * 2. If valid (no misses/sunk cells blocking), increment covered cells
- * 3. Repeat for all ship sizes
- * 4. Apply center bonus (empirically improves performance)
- */
-function calculateProbabilityMap(board: Board, shipSizes: number[]): number[][] {
-  // Initialize 10x10 probability grid with zeros
-  const probabilities: number[][] = Array(BOARD_SIZE)
-    .fill(null)
-    .map(() => Array(BOARD_SIZE).fill(0));
-
-  // For each remaining ship size
-  for (const size of shipSizes) {
-    // Try all horizontal placements
-    for (let row = 0; row < BOARD_SIZE; row++) {
-      for (let col = 0; col <= BOARD_SIZE - size; col++) {
-        if (canPlaceShipForProbability(board, row, col, size, 'horizontal')) {
-          // This placement is valid - increment all covered cells
-          for (let i = 0; i < size; i++) {
-            probabilities[row][col + i]++;
-          }
-        }
-      }
-    }
-
-    // Try all vertical placements
-    for (let row = 0; row <= BOARD_SIZE - size; row++) {
-      for (let col = 0; col < BOARD_SIZE; col++) {
-        if (canPlaceShipForProbability(board, row, col, size, 'vertical')) {
-          // This placement is valid - increment all covered cells
-          for (let i = 0; i < size; i++) {
-            probabilities[row + i][col]++;
-          }
-        }
-      }
-    }
-  }
-
-  // Zero out already-shot cells (can't shoot there again)
-  for (let row = 0; row < BOARD_SIZE; row++) {
-    for (let col = 0; col < BOARD_SIZE; col++) {
-      if (isCellShot(board, { row, col })) {
-        probabilities[row][col] = 0;
-      }
-    }
-  }
-
-  // Apply center bonus: cells closer to center get slight probability boost
-  // This is based on the observation that random ship placement
-  // tends to favor center cells (more room for large ships)
-  const center = BOARD_SIZE / 2;
-  for (let row = 0; row < BOARD_SIZE; row++) {
-    for (let col = 0; col < BOARD_SIZE; col++) {
-      if (probabilities[row][col] > 0) {
-        const distFromCenter = Math.abs(row - center) + Math.abs(col - center);
-        const bonus = Math.max(0, (BOARD_SIZE - distFromCenter) / BOARD_SIZE);
-        probabilities[row][col] += bonus * 0.5;
-      }
-    }
-  }
-
-  return probabilities;
-}
-
-/**
- * Checks if a ship COULD be placed at position (for probability calculation).
- *
- * Unlike regular placement, this only checks for blockers (miss/sunk cells),
- * not for existing ships (since we're calculating probability, not placing).
- *
- * @param {Board} board - Current board state
- * @param {number} startRow - Starting row
- * @param {number} startCol - Starting column
- * @param {number} size - Ship size
- * @param {'horizontal' | 'vertical'} orientation - Ship orientation
- * @returns {boolean} True if ship could potentially be here
- */
-function canPlaceShipForProbability(
-  board: Board,
-  startRow: number,
-  startCol: number,
-  size: number,
-  orientation: 'horizontal' | 'vertical'
-): boolean {
-  for (let i = 0; i < size; i++) {
-    const row = orientation === 'vertical' ? startRow + i : startRow;
-    const col = orientation === 'horizontal' ? startCol + i : startCol;
-
-    // Check bounds
-    if (row >= BOARD_SIZE || col >= BOARD_SIZE) return false;
-
-    const cell = board[row][col];
-    // Can't place if there's a miss or sunk ship here
-    // (hit cells MIGHT be part of a longer unsunk ship, so we allow them)
-    if (cell.state === 'miss' || cell.state === 'sunk') {
-      return false;
-    }
-  }
-  return true;
-}
-
-/**
- * Main AI shot selection function.
- *
- * Delegates to appropriate difficulty algorithm.
- *
- * @param {Board} board - Player's board (what AI shoots at)
- * @param {Difficulty} difficulty - Selected difficulty level
- * @param {AIHuntState} huntState - Current AI state
- * @param {number[]} remainingShipSizes - Sizes of unsunk player ships
- * @returns {{ position: Position; newState: AIHuntState }}
- *
- * INTERVIEW TIP:
- * This is the Strategy Pattern - the algorithm is selected at runtime
- * based on difficulty setting. All three strategies implement the same
- * interface (take board + state, return position + new state).
- *
- * Usage flow:
- * 1. Call getAIShot() to get position to fire at
- * 2. Process the shot with processShot()
- * 3. Call updateAIHuntState() with the result
- * 4. Store new hunt state for next turn
- */
-export function getAIShot(
-  board: Board,
-  difficulty: Difficulty,
-  huntState: AIHuntState,
-  remainingShipSizes: number[]
-): { position: Position; newState: AIHuntState } {
-  switch (difficulty) {
-    case 'easy':
-      // Easy: Pure random, no state needed
-      return { position: getEasyShot(board), newState: huntState };
-
-    case 'medium':
-      // Medium: Hunt/Target algorithm
-      return getMediumShot(board, huntState);
-
-    case 'hard':
-      // Hard: Probability + Hunt/Target
-      return getHardShot(board, huntState, remainingShipSizes);
-
-    default:
-      // Fallback to easy
-      return { position: getEasyShot(board), newState: huntState };
-  }
 }

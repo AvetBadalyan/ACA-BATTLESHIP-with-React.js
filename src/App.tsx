@@ -1,16 +1,15 @@
-import { useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useGameStore } from '@/store';
-import { Header, Board, ShipSelector, GameStats, TurnIndicator, GameOverModal } from '@/components';
+import { Board, GameOverModal, GameStats, Header, ShipSelector, TurnIndicator } from '@/components';
 import { useKeyboard } from '@/hooks';
-import { soundManager } from '@/utils/sounds';
+import { useGameStore } from '@/store';
 import '@/styles/global.css';
+import { soundManager } from '@/utils/sounds';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useCallback, useEffect } from 'react';
 import styles from './App.module.css';
 
 function App() {
   const {
     phase,
-    difficulty,
     currentTurn,
     winner,
     playerBoard,
@@ -141,11 +140,7 @@ function App() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             >
-              <TurnIndicator
-                currentTurn={currentTurn}
-                difficulty={difficulty}
-                lastShot={lastShot}
-              />
+              <TurnIndicator currentTurn={currentTurn} lastShot={lastShot} />
 
               <div className={styles.gameBoards}>
                 <div className={styles.boardSection}>

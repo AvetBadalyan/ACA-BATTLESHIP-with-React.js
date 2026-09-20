@@ -1,26 +1,14 @@
+import { Player } from '@/types';
 import { motion } from 'framer-motion';
-import { Player, Difficulty } from '@/types';
 import styles from './TurnIndicator.module.css';
 
 interface TurnIndicatorProps {
   currentTurn: Player;
-  difficulty: Difficulty;
   lastShot?: { result: 'hit' | 'miss' | 'sunk' } | null;
 }
 
-export function TurnIndicator({ currentTurn, difficulty, lastShot }: TurnIndicatorProps) {
+export function TurnIndicator({ currentTurn, lastShot }: TurnIndicatorProps) {
   const isPlayerTurn = currentTurn === 'player';
-
-  const getDifficultyLabel = () => {
-    switch (difficulty) {
-      case 'easy':
-        return '🟢 Easy';
-      case 'medium':
-        return '🟡 Medium';
-      case 'hard':
-        return '🔴 Hard';
-    }
-  };
 
   const getLastShotMessage = () => {
     if (!lastShot) return null;
@@ -51,8 +39,6 @@ export function TurnIndicator({ currentTurn, difficulty, lastShot }: TurnIndicat
           <span className={styles.turnIcon}>{isPlayerTurn ? '🎯' : '🤖'}</span>
           <span className={styles.turnText}>{isPlayerTurn ? 'Your Turn' : 'AI Thinking...'}</span>
         </motion.div>
-
-        {!isPlayerTurn && <span className={styles.difficulty}>{getDifficultyLabel()}</span>}
       </div>
 
       {lastShot && (
