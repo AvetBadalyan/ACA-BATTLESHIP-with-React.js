@@ -21,7 +21,7 @@ src/
 ├── utils/              # Pure utility functions
 │   ├── board.ts        # Board operations (place, shoot)
 │   ├── ai.ts           # AI opponent algorithms
-│   └── sounds.ts       # Web Audio API sounds
+│   └── sounds.ts       # File-based sound effects
 ├── hooks/              # Custom React hooks
 │   └── useKeyboard.ts  # Keyboard event handling
 ├── styles/             # Global styles
@@ -233,20 +233,16 @@ getAIShot(board, state):
     while state.targetQueue not empty:
         target = state.targetQueue.dequeue()   // FIFO
         if target not already shot:
-            return target
+            return { mode: 'target', queue }
 
     // HUNT MODE: nothing queued, fire at a random untried cell
-    state.mode = 'hunt'
-    return randomUntriedCell(board)
+    return { mode: 'hunt', queue: [] }
 
 updateAIHuntState(state, position, result, board):
     on hit:
-        state.mode = 'target'
-        state.hitStack.push(position)
-        enqueue valid, un-shot neighbors of position
-        if 2+ in-line hits: detect direction, sort queue that way
+        enqueue valid, un-shot neighbors of position (mode: 'target')
     on sunk:
-        clear queue + hitStack, state.mode = 'hunt'
+        clear queue (mode: 'hunt')
     on miss:
         keep state unchanged
 ```
@@ -254,9 +250,9 @@ updateAIHuntState(state, position, result, board):
 Characteristics:
 
 - Uses a FIFO queue for systematic targeting
-- Remembers hit locations and infers ship orientation
 - Move selection is O(n²) worst case (hunt-mode scan); state update is O(1)
-  aside from a small neighbor-queue sort
+- A possible extension: detect ship orientation after two in-line hits and
+  prioritise that direction (intentionally left out to keep it simple)
 
 ## 📊 State Structure
 
@@ -276,7 +272,7 @@ GameState {
   aiBoard: Cell[10][10]
   aiShips: Ship[5]
   aiStats: { ... }
-  aiHuntState: { mode, targetQueue, hitStack, ... }
+  aiHuntState: { mode, targetQueue }
 
   // UI state
   selectedShip: ShipType | null
@@ -327,29 +323,18 @@ function createEmptyStats(): GameStats { ... }
 function createAIHuntState(): AIHuntState { ... }
 ```
 
-### 4. **State Machine (AI)**
+### 4. **Pure Functions**
 
-The AI's behavior is driven by its current mode, which transitions based on
-shot results:
-
-```typescript
-// getAIShot reads the mode; updateAIHuntState transitions it
-'hunt'  --(on hit)--> 'target'
-'target' --(on sunk)--> 'hunt'
-// In target mode it drains a queue of neighbor cells; in hunt mode
-// it fires at a random untried cell.
-```
-
-### 5. **Singleton Pattern**
-
-Sound manager is a single instance:
+Board and AI logic are pure functions with no side effects — same input,
+same output — which keeps them easy to reason about and test:
 
 ```typescript
-export const soundManager = new SoundManager();
-// Used throughout: soundManager.play('hit')
+// utils/board.ts, utils/ai.ts
+processShot(board, ships, position); // returns a new board + result
+getAIShot(board, huntState); // returns a position + new state
 ```
 
-### 6. **Observer Pattern**
+### 5. **Observer Pattern**
 
 React components subscribe to store changes via Zustand:
 
@@ -371,27 +356,34 @@ const { phase, playerBoard } = useGameStore();
 | `TurnIndicator` | Show current turn, last shot result              |
 | `GameOverModal` | Victory/defeat display, play again button        |
 
-## 🔊 Sound Generation
+## 🔊 Sound Effects
 
-Sounds are synthesized using Web Audio API (no audio files):
+Short audio files (one per action) are imported so Vite bundles and
+cache-hashes them. `sounds.ts` keeps one `Audio` object per sound and a
+small `playSound` function:
 
 ```typescript
-// Explosion (hit)
-oscillator(80Hz, sawtooth) + whiteNoise(500Hz lowpass)
+import hitUrl from '@/assets/sounds/hit.wav';
+// ...one import per sound
 
-// Splash (miss)
-whiteNoise(800Hz lowpass) + oscillator(200Hz, sine)
+const sounds = { hit: new Audio(hitUrl) /* , ... */ };
 
-// Victory
-ascending major chord: C5 → E5 → G5 → C6
-
-// Defeat
-descending minor: A4 → F4 → D4
+export function playSound(name: SoundName) {
+  if (!soundEnabled) return;
+  const audio = sounds[name];
+  audio.currentTime = 0; // rewind so rapid sounds retrigger
+  void audio.play().catch(() => {}); // ignore autoplay rejections
+}
 ```
+
+No classes and no `this` — just an object of `Audio` instances and two
+functions (`playSound`, `setSoundEnabled`).
 
 ## 📱 Responsive Design
 
-CSS variables adapt to screen size:
+CSS variables adapt the cell size to the screen. Sizes are chosen so the
+10-wide board never overflows, down to a 24px floor (the WCAG 2.2 AA
+minimum touch target):
 
 ```css
 :root {
@@ -399,15 +391,16 @@ CSS variables adapt to screen size:
 }
 
 @media (max-width: 768px) {
-  :root {
-    --cell-size: 32px; /* Tablet */
-  }
+  --cell-size: 32px; /* Tablet */
 }
-
 @media (max-width: 480px) {
-  :root {
-    --cell-size: 28px; /* Mobile */
-  }
+  --cell-size: 30px; /* Mid-size phones (375-480px) */
+}
+@media (max-width: 380px) {
+  --cell-size: 28px; /* Small phones (360/375) */
+}
+@media (max-width: 340px) {
+  --cell-size: 24px; /* Very small phones (320px) */
 }
 ```
 
@@ -485,15 +478,15 @@ interface GameHistory {
 
 **Q: How does the AI work?**
 
-> It's a Hunt/Target state machine. In hunt mode it fires at random untried cells; once it hits, it switches to target mode and works through a queue of the hit's neighbors until the ship sinks, then goes back to hunting. After two in-line hits it infers the ship's orientation and tries that direction first.
+> It's a Hunt/Target state machine. In hunt mode it fires at random untried cells; once it hits, it switches to target mode and works through a queue of the hit's neighbors until the ship sinks, then goes back to hunting.
 
 **Q: How is state managed immutably?**
 
 > All state updates use spread operators or map() to create new objects. This enables React's change detection and allows for features like undo/redo.
 
-**Q: Why Web Audio API instead of audio files?**
+**Q: How are sound effects implemented?**
 
-> Smaller bundle size, no HTTP requests, works offline, and sounds can be parameterized at runtime. It demonstrates understanding of browser APIs.
+> Short audio files, one per action, imported so Vite bundles and hashes them. A `playSound(name)` function keeps one `Audio` object per sound, resets `currentTime` so a sound can retrigger immediately, and calls `.play()` (ignoring the autoplay-policy rejection). No classes — just an object and two functions.
 
 **Q: How would you add multiplayer?**
 

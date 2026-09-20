@@ -46,11 +46,9 @@ A modern, single-player Battleship game built with React 19, TypeScript, and Vit
 
 ### 🎵 Audio & Visual Effects
 
-- Synthesized sound effects (Web Audio API - no files needed!)
-  - Explosion sounds for hits
-  - Splash sounds for misses
-  - Ship sinking audio
-  - Victory/defeat fanfares
+- Sound effects for every action (hit, miss, sunk, place, rotate,
+  victory, defeat), played from short audio files via the browser's
+  Audio API
 - Smooth animations with Framer Motion
 - Water ripple effects on cells
 - Hit/miss/sunk visual indicators
@@ -92,7 +90,7 @@ The game adapts to all screen sizes:
 | **Zustand**       | Lightweight state management      |
 | **Framer Motion** | Smooth animations                 |
 | **CSS Modules**   | Scoped styling                    |
-| **Web Audio API** | Synthesized sound effects         |
+| **Audio API**     | File-based sound effects          |
 
 ---
 
@@ -107,8 +105,8 @@ The game adapts to all screen sizes:
 
 ```bash
 # Clone the repository
-git clone https://github.com/AvetBadalyan/ACA-BATTLESHIP-with-React.js.git
-cd ACA-BATTLESHIP-with-React.js/game-front
+git clone https://github.com/AvetBadalyan/ACA-Battleship-React.git
+cd ACA-Battleship-React
 
 # Install dependencies
 npm install
@@ -171,8 +169,8 @@ src/
 │   └── game.ts      # All shared types
 ├── utils/           # Game logic (pure functions)
 │   ├── board.ts     # Board operations
-│   ├── ai.ts        # AI algorithms
-│   └── sounds.ts    # Web Audio API sounds
+│   ├── ai.ts        # AI algorithm
+│   └── sounds.ts    # File-based sound effects
 ├── hooks/           # Custom React hooks
 └── styles/          # CSS variables & global styles
 ```
@@ -185,12 +183,12 @@ User Action → Component → Store Action → Utility Function → State Update
 
 ### Key Design Patterns
 
-| Pattern           | Usage                                |
-| ----------------- | ------------------------------------ |
-| **Immutability**  | All state updates create new objects |
-| **State Machine** | Game phases and AI hunt/target modes |
-| **Factory**       | Object creation functions            |
-| **Singleton**     | Sound manager instance               |
+| Pattern            | Usage                                    |
+| ------------------ | ---------------------------------------- |
+| **Immutability**   | All state updates create new objects     |
+| **State Machine**  | Game phases and AI hunt/target modes     |
+| **Factory**        | Object creation functions                |
+| **Pure functions** | Board and AI logic kept side-effect free |
 
 ---
 
@@ -202,12 +200,12 @@ state machine:
 - **Hunt mode**: fire at a random untried cell until something is hit
 - **Target mode**: on a hit, queue the four adjacent cells and fire at them
   in turn to sink the ship
-- **Direction detection**: after two in-line hits, the AI infers whether the
-  ship is horizontal or vertical and prioritizes that direction
 - On sinking a ship, it clears its queue and returns to hunt mode
 
 This is meaningfully smarter than random guessing (it finishes ships it
-finds) while staying simple enough to reason about and explain.
+finds) while staying simple enough to reason about and explain. A natural
+next step would be to detect ship orientation after two in-line hits and
+prioritise that direction — left out here to keep the logic simple.
 
 ---
 
@@ -223,9 +221,9 @@ This project demonstrates several skills valuable for interviews:
 | **TypeScript**       | Strict typing, interfaces, generics            |
 | **State Management** | Zustand with persistence middleware            |
 | **Algorithms**       | Hunt/Target AI (state machine + queue search)  |
-| **Data Structures**  | 2D arrays, queue, stack                        |
+| **Data Structures**  | 2D arrays, FIFO queue                          |
 | **CSS**              | Variables, modules, responsive design          |
-| **Web APIs**         | Web Audio API for sound synthesis              |
+| **Web APIs**         | Audio API for sound playback                   |
 | **Build Tools**      | Vite configuration, TypeScript setup           |
 
 ### Common Interview Questions
@@ -254,12 +252,12 @@ It uses the **Hunt/Target** algorithm, a two-mode state machine:
 - **Target mode**: once a cell is hit, its neighbors are pushed onto a FIFO
   queue. The AI drains that queue, firing at each valid neighbor, so it
   finishes off any ship it finds instead of wandering off.
-- **Direction detection**: after two in-line hits it infers the ship's
-  orientation and sorts the queue to try that direction first.
 - On a sink, it clears the queue and returns to hunt mode.
 
-The state (`mode`, `targetQueue`, `hitStack`, `shipDirection`) lives in an
-`AIHuntState` object that's updated immutably after every shot.
+The state (`mode`, `targetQueue`) lives in an `AIHuntState` object that's
+updated immutably after every shot. A natural extension would be to detect
+ship orientation after two in-line hits and prioritise that direction; I
+left it out to keep the code simple to read and explain.
 
 </details>
 
@@ -289,17 +287,17 @@ newBoard[pos.row][pos.col].state = 'hit';
 </details>
 
 <details>
-<summary><strong>Q: Why use Web Audio API instead of audio files?</strong></summary>
+<summary><strong>Q: How are the sound effects implemented?</strong></summary>
 
-Benefits:
+Short audio files (one per action) are imported so Vite bundles and
+cache-hashes them. `sounds.ts` keeps one `Audio` object per sound and a
+`playSound(name)` function that resets `currentTime` (so the same sound can
+retrigger immediately) and calls `.play()`. A `play()` promise can reject —
+for example before the user's first interaction — so the rejection is caught
+and ignored, keeping sound failures from ever affecting gameplay.
 
-1. **Smaller Bundle** - No audio files to download
-2. **No HTTP Requests** - Sounds generated instantly
-3. **Parameterizable** - Can modify sounds at runtime
-4. **Works Offline** - No external dependencies
-5. **Demonstrates API Knowledge** - Shows understanding of browser APIs
-
-The sounds are created by combining oscillators (for tones) and noise generators (for explosions/splashes).
+No classes and no `this`: it's just an object of `Audio` instances plus two
+small functions (`playSound`, `setSoundEnabled`).
 </details>
 
 <details>
@@ -342,8 +340,7 @@ Each turn is at most **O(n²)** where n = board size (10):
   picks one at random in O(1).
 
 So a move is ~100 operations in the worst case — trivial for the browser.
-Updating the hunt state after a shot is also O(1) aside from a small sort of
-the neighbor queue.
+Updating the hunt state after a shot is O(1) (queue a few neighbors).
 
 </details>
 
@@ -356,8 +353,6 @@ For interviews, I recommend reviewing these files in order:
 3. **`utils/ai.ts`** - AI algorithms (most interesting!)
 4. **`store/gameStore.ts`** - State management and actions
 5. **`components/Board/Board.tsx`** - React component patterns
-
-Each file has extensive JSDoc comments with interview tips.
 
 ---
 
