@@ -1,5 +1,6 @@
 import { Cell as CellType } from '@/types'
 import { motion } from 'framer-motion'
+import type { KeyboardEvent as ReactKeyboardEvent } from 'react'
 import styles from './Cell.module.css'
 
 interface CellProps {
@@ -58,18 +59,39 @@ export function Cell({
 		return classes.join(' ')
 	}
 
+	const isResolved = state === 'hit' || state === 'miss' || state === 'sunk'
+	const isInteractive = !disabled && !!onClick && !isResolved
+
 	const handleClick = () => {
-		if (!disabled && onClick) {
-			onClick()
+		if (isInteractive) {
+			onClick!()
 		}
 	}
+
+	const handleKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
+		if (isInteractive && (event.key === 'Enter' || event.key === ' ')) {
+			event.preventDefault()
+			onClick!()
+		}
+	}
+
+	const { row, col } = cell.position
+	const coord = `${String.fromCharCode(65 + col)}${row + 1}`
+	const ariaLabel = isInteractive
+		? `Fire at ${coord}`
+		: `Cell ${coord}, ${state}`
 
 	return (
 		<motion.div
 			className={getClassName()}
 			onClick={handleClick}
-			whileHover={!disabled && onClick ? { scale: 1.05 } : undefined}
-			whileTap={!disabled && onClick ? { scale: 0.95 } : undefined}
+			onKeyDown={isInteractive ? handleKeyDown : undefined}
+			role={isInteractive ? 'button' : undefined}
+			tabIndex={isInteractive ? 0 : undefined}
+			aria-label={onClick ? ariaLabel : undefined}
+			aria-disabled={onClick && !isInteractive ? true : undefined}
+			whileHover={isInteractive ? { scale: 1.05 } : undefined}
+			whileTap={isInteractive ? { scale: 0.95 } : undefined}
 		>
 			{/* Water animation */}
 			<div className={styles.water}>

@@ -1,123 +1,119 @@
 /* CSS Variables for theming */
 :root {
-  /* Dark theme (default) */
-  --bg-primary: #0a1628;
-  --bg-secondary: #162032;
-  --bg-tertiary: #1e2d45;
-  --bg-card: #1a2940;
-  
-  --text-primary: #e8f1ff;
-  --text-secondary: #8ba3c7;
-  --text-muted: #5a7294;
-  
-  --accent-primary: #00d4ff;
-  --accent-secondary: #0099cc;
-  --accent-glow: rgba(0, 212, 255, 0.3);
-  
-  --ocean-light: #1a4a6e;
-  --ocean-dark: #0d2840;
-  --ocean-wave: #164566;
-  
-  --ship-color: #4a6fa5;
-  --ship-border: #6b8fc5;
-  --ship-glow: rgba(74, 111, 165, 0.4);
-  
-  --hit-color: #ff4757;
-  --hit-glow: rgba(255, 71, 87, 0.5);
-  --hit-bg: #8b0000;
-  
-  --miss-color: #5a6c7d;
-  --miss-bg: #2a3a4a;
-  
-  --sunk-color: #ff6b6b;
-  --sunk-glow: rgba(255, 107, 107, 0.6);
-  
-  --success-color: #2ed573;
-  --warning-color: #ffa502;
-  --error-color: #ff4757;
-  
-  --border-color: #2a3f5f;
-  --border-light: #3a5070;
-  
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
-  --shadow-glow: 0 0 20px var(--accent-glow);
-  
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  
-  --transition-fast: 150ms ease;
-  --transition-normal: 250ms ease;
-  --transition-slow: 400ms ease;
-  
-  --font-mono: 'Courier New', monospace;
-  --font-display: 'Segoe UI', system-ui, sans-serif;
-  
-  --cell-size: 40px;
-  --cell-gap: 2px;
-  --board-padding: 16px;
+	/* Dark theme (default) */
+	--bg-primary: #0a1628;
+	--bg-secondary: #162032;
+	--bg-tertiary: #1e2d45;
+	--bg-card: #1a2940;
+
+	--text-primary: #e8f1ff;
+	--text-secondary: #8ba3c7;
+	--text-muted: #5a7294;
+
+	--accent-primary: #00d4ff;
+	--accent-secondary: #0099cc;
+	--accent-glow: rgba(0, 212, 255, 0.3);
+
+	--ocean-light: #1a4a6e;
+	--ocean-dark: #0d2840;
+
+	--ship-color: #4a6fa5;
+	--ship-border: #6b8fc5;
+
+	--hit-color: #ff4757;
+	--hit-glow: rgba(255, 71, 87, 0.5);
+	--hit-bg: #8b0000;
+
+	--miss-color: #5a6c7d;
+	--miss-bg: #2a3a4a;
+
+	--sunk-color: #ff6b6b;
+	--sunk-glow: rgba(255, 107, 107, 0.6);
+
+	--success-color: #2ed573;
+	--warning-color: #ffa502;
+	--error-color: #ff4757;
+
+	--border-color: #2a3f5f;
+	--border-light: #3a5070;
+
+	--shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+	--shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+	--shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+
+	--radius-sm: 4px;
+	--radius-md: 8px;
+	--radius-lg: 12px;
+	--radius-xl: 16px;
+
+	--transition-fast: 150ms ease;
+	--transition-normal: 250ms ease;
+
+	--font-mono: 'Courier New', monospace;
+	--font-display: 'Segoe UI', system-ui, sans-serif;
+
+	--cell-size: 40px;
+	--cell-gap: 2px;
+	--board-padding: 16px;
 }
 
 /* Light theme */
-[data-theme="light"] {
-  --bg-primary: #e8f4fc;
-  --bg-secondary: #d0e8f5;
-  --bg-tertiary: #b8dced;
-  --bg-card: #ffffff;
-  
-  --text-primary: #1a3a5c;
-  --text-secondary: #3a6080;
-  --text-muted: #6a90b0;
-  
-  --accent-primary: #0077b6;
-  --accent-secondary: #005a8c;
-  --accent-glow: rgba(0, 119, 182, 0.2);
-  
-  --ocean-light: #90caf9;
-  --ocean-dark: #64b5f6;
-  --ocean-wave: #42a5f5;
-  
-  --ship-color: #37474f;
-  --ship-border: #546e7a;
-  --ship-glow: rgba(55, 71, 79, 0.3);
-  
-  --hit-color: #d32f2f;
-  --hit-glow: rgba(211, 47, 47, 0.4);
-  --hit-bg: #ffcdd2;
-  
-  --miss-color: #78909c;
-  --miss-bg: #cfd8dc;
-  
-  --sunk-color: #b71c1c;
-  --sunk-glow: rgba(183, 28, 28, 0.4);
-  
-  --success-color: #2e7d32;
-  --warning-color: #f57c00;
-  --error-color: #d32f2f;
-  
-  --border-color: #b0c4de;
-  --border-light: #ccd9e8;
-  
-  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.2);
+[data-theme='light'] {
+	--bg-primary: #e8f4fc;
+	--bg-secondary: #d0e8f5;
+	--bg-tertiary: #b8dced;
+	--bg-card: #ffffff;
+
+	--text-primary: #1a3a5c;
+	--text-secondary: #3a6080;
+	--text-muted: #6a90b0;
+
+	--accent-primary: #0077b6;
+	--accent-secondary: #005a8c;
+	--accent-glow: rgba(0, 119, 182, 0.2);
+
+	--ocean-light: #90caf9;
+	--ocean-dark: #64b5f6;
+	--ocean-wave: #42a5f5;
+
+	--ship-color: #37474f;
+	--ship-border: #546e7a;
+	--ship-glow: rgba(55, 71, 79, 0.3);
+
+	--hit-color: #d32f2f;
+	--hit-glow: rgba(211, 47, 47, 0.4);
+	--hit-bg: #ffcdd2;
+
+	--miss-color: #78909c;
+	--miss-bg: #cfd8dc;
+
+	--sunk-color: #b71c1c;
+	--sunk-glow: rgba(183, 28, 28, 0.4);
+
+	--success-color: #2e7d32;
+	--warning-color: #f57c00;
+	--error-color: #d32f2f;
+
+	--border-color: #b0c4de;
+	--border-light: #ccd9e8;
+
+	--shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+	--shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+	--shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.2);
 }
 
 /* Responsive cell sizes */
 @media (max-width: 768px) {
-  :root {
-    --cell-size: 32px;
-    --cell-gap: 1px;
-    --board-padding: 12px;
-  }
+	:root {
+		--cell-size: 32px;
+		--cell-gap: 1px;
+		--board-padding: 12px;
+	}
 }
 
 @media (max-width: 480px) {
-  :root {
-    --cell-size: 28px;
-    --board-padding: 8px;
-  }
+	:root {
+		--cell-size: 28px;
+		--board-padding: 8px;
+	}
 }
