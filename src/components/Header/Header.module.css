@@ -15,7 +15,7 @@
 }
 
 .logoIcon {
-  font-size: 2rem;
+  font-size: var(--fs-xl);
   animation: float 3s ease-in-out infinite;
 }
 
@@ -30,7 +30,7 @@
 }
 
 .title {
-  font-size: 1.75rem;
+  font-size: var(--fs-3xl);
   font-weight: 700;
   color: var(--text-primary);
   text-transform: uppercase;
@@ -50,7 +50,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
+  font-size: var(--fs-2xl);
   background: var(--bg-tertiary);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
@@ -85,11 +85,11 @@
   }
 
   .title {
-    font-size: 1.25rem;
+    font-size: var(--fs-xl);
   }
 
   .logoIcon {
-    font-size: 1.5rem;
+    font-size: var(--fs-2xl);
   }
 
   .controls {
@@ -99,6 +99,6 @@
   .iconButton {
     width: 40px;
     height: 40px;
-    font-size: 1.25rem;
+    font-size: var(--fs-xl);
   }
 }

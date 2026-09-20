@@ -16,7 +16,7 @@
 }
 
 .title {
-  font-size: 0.9rem;
+  font-size: var(--fs-base);
   font-weight: 600;
   color: var(--text-secondary);
   text-transform: uppercase;
@@ -42,7 +42,7 @@
 }
 
 .statValue {
-  font-size: 1.5rem;
+  font-size: var(--fs-2xl);
   font-weight: 700;
   color: var(--text-primary);
   font-family: var(--font-mono);
@@ -61,8 +61,10 @@
 }
 
 .statLabel {
-  font-size: 0.7rem;
-  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  /* secondary (not muted) because this label sits on the bg-tertiary
+     stat box, where muted text falls below WCAG AA */
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -84,17 +86,17 @@
 }
 
 .shipsIcon {
-  font-size: 1.25rem;
+  font-size: var(--fs-xl);
 }
 
 .shipsValue {
-  font-size: 1.25rem;
+  font-size: var(--fs-xl);
   font-weight: 700;
   color: var(--text-primary);
 }
 
 .shipsLabel {
-  font-size: 0.65rem;
+  font-size: var(--fs-sm);
   color: var(--text-muted);
   text-transform: uppercase;
 }
@@ -107,11 +109,11 @@
 }
 
 .timerIcon {
-  font-size: 1rem;
+  font-size: var(--fs-lg);
 }
 
 .timerValue {
-  font-size: 1.25rem;
+  font-size: var(--fs-xl);
   font-weight: 600;
   font-family: var(--font-mono);
   color: var(--text-primary);
@@ -129,6 +131,6 @@
   }
 
   .statValue {
-    font-size: 1.25rem;
+    font-size: var(--fs-xl);
   }
 }

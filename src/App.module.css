@@ -66,7 +66,7 @@
 }
 
 .instructions h3 {
-  font-size: 1rem;
+  font-size: var(--fs-lg);
   color: var(--accent-primary);
   margin: 0;
   white-space: nowrap;
@@ -85,7 +85,7 @@
 
 .instructions li {
   color: var(--text-secondary);
-  font-size: 0.85rem;
+  font-size: var(--fs-base);
   padding-left: 18px;
   position: relative;
   white-space: nowrap;

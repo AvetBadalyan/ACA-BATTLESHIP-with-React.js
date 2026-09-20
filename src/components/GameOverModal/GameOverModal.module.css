@@ -36,7 +36,7 @@
 }
 
 .icon {
-  font-size: 4rem;
+  font-size: 6.4rem; /* decorative emoji, not part of the type scale */
   margin-bottom: 12px;
   display: block;
 }
@@ -56,7 +56,7 @@
 }
 
 .title {
-  font-size: 2rem;
+  font-size: var(--fs-4xl);
   font-weight: 700;
   margin-bottom: 8px;
 }
@@ -73,7 +73,7 @@
 
 .subtitle {
   color: var(--text-secondary);
-  font-size: 1rem;
+  font-size: var(--fs-lg);
 }
 
 .statsComparison {
@@ -87,7 +87,7 @@
 }
 
 .statTitle {
-  font-size: 0.85rem;
+  font-size: var(--fs-base);
   font-weight: 600;
   color: var(--text-secondary);
   text-transform: uppercase;
@@ -101,7 +101,7 @@
   justify-content: space-between;
   padding: 8px 0;
   border-bottom: 1px solid var(--border-color);
-  font-size: 0.9rem;
+  font-size: var(--fs-base);
   color: var(--text-secondary);
 }
 
@@ -141,13 +141,13 @@
 }
 
 .timeIcon {
-  font-size: 1.25rem;
+  font-size: var(--fs-xl);
 }
 
 .playAgainBtn {
   width: 100%;
   padding: 16px;
-  font-size: 1.1rem;
+  font-size: var(--fs-lg);
 }
 
 /* Responsive */
@@ -157,11 +157,11 @@
   }
 
   .icon {
-    font-size: 3rem;
+    font-size: 4.8rem; /* decorative emoji, not part of the type scale */
   }
 
   .title {
-    font-size: 1.5rem;
+    font-size: var(--fs-2xl);
   }
 
   .statsComparison {

@@ -11,7 +11,7 @@
 }
 
 .title {
-  font-size: 1.25rem;
+  font-size: var(--fs-xl);
   font-weight: 600;
   color: var(--text-primary);
   text-transform: uppercase;
@@ -72,12 +72,14 @@
 .shipName {
   font-weight: 600;
   color: var(--text-primary);
-  font-size: 0.95rem;
+  font-size: var(--fs-base);
 }
 
 .shipSize {
-  font-size: 0.75rem;
-  color: var(--text-muted);
+  font-size: var(--fs-sm);
+  /* secondary (not muted) because this sits on the bg-tertiary ship item,
+     where muted text falls below WCAG AA */
+  color: var(--text-secondary);
 }
 
 .shipPreview {
@@ -109,7 +111,7 @@
   top: 50%;
   transform: translateY(-50%);
   color: var(--success-color);
-  font-size: 1.25rem;
+  font-size: var(--fs-xl);
   font-weight: bold;
 }
 
@@ -128,7 +130,7 @@
 }
 
 .label {
-  font-size: 0.85rem;
+  font-size: var(--fs-base);
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -147,7 +149,7 @@
     border-color var(--transition-fast),
     background var(--transition-fast);
   color: var(--text-primary);
-  font-size: 0.9rem;
+  font-size: var(--fs-base);
 }
 
 .orientationBtn:hover,
@@ -157,11 +159,11 @@
 }
 
 .orientationIcon {
-  font-size: 1.25rem;
+  font-size: var(--fs-xl);
 }
 
 .hint {
-  font-size: 0.75rem;
+  font-size: var(--fs-sm);
   color: var(--text-muted);
   font-style: italic;
 }
@@ -178,7 +180,7 @@
 .startButton {
   width: 100%;
   padding: 16px;
-  font-size: 1.1rem;
+  font-size: var(--fs-lg);
   margin-top: 8px;
 }
 

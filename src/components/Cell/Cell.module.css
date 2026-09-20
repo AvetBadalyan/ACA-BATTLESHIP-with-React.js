@@ -131,7 +131,7 @@
 }
 
 .hitIcon {
-  font-size: 1.2rem;
+  font-size: 1.9rem; /* decorative emoji, not part of the type scale */
   z-index: 3;
   filter: drop-shadow(0 0 4px var(--hit-color));
 }
@@ -185,7 +185,7 @@
 }
 
 .sunkIcon {
-  font-size: 1.4rem;
+  font-size: 2.2rem; /* decorative emoji, not part of the type scale */
   animation: sunkFlicker 0.5s ease-in-out infinite alternate;
 }
 
