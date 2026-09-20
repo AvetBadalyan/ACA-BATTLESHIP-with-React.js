@@ -1,35 +1,7 @@
 /**
- * @fileoverview Zustand Game Store - Central State Management
- *
- * This store manages ALL game state using Zustand, a lightweight
- * state management library. It replaces the previous Context API
- * approach with a more performant and simpler solution.
- *
- * @module store/gameStore
- *
- * INTERVIEW NOTES:
- * ================
- *
- * WHY ZUSTAND OVER CONTEXT API?
- * 1. Performance: Zustand only re-renders components that use changed state
- *    Context re-renders ALL consumers when ANY state changes
- *
- * 2. Simplicity: No Provider wrapper needed, just import and use
- *    const { phase } = useGameStore()
- *
- * 3. Devtools: Built-in Redux DevTools support
- *
- * 4. Persistence: Easy localStorage/sessionStorage integration
- *
- * 5. Middleware: Supports logging, immer, persist out of the box
- *
- * STORE ARCHITECTURE:
- * - State: All game data (boards, ships, stats, UI state)
- * - Actions: Functions that modify state (placeShip, shoot, etc.)
- * - Selectors: Derived from state automatically by Zustand
- *
- * DATA FLOW:
- * User Action → Action Function → State Update → React Re-render
+ * Zustand store holding all game state and the actions that change it.
+ * Actions call the pure board/ai utils, then commit the result with set().
+ * Only settings (sound, theme) are persisted to localStorage, not game state.
  */
 
 import { AIHuntState, GameState, GameStats, Position, SHIP_TYPES, ShipType } from '@/types';
@@ -46,16 +18,7 @@ import { playSound, setSoundEnabled } from '@/utils/sounds';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-/**
- * Creates an empty game statistics object.
- *
- * @returns {GameStats} Initial stats with all counters at zero
- *
- * INTERVIEW TIP:
- * This is a Factory Function pattern - creates objects with
- * consistent structure. Using a function instead of a constant
- * ensures each call gets a fresh object (avoiding mutation bugs).
- */
+/** Fresh stats object (a function so each game gets its own copy). */
 const createEmptyStats = (): GameStats => ({
   shotsFired: 0,
   hits: 0,
@@ -65,145 +28,55 @@ const createEmptyStats = (): GameStats => ({
   endTime: null,
 });
 
-/**
- * GameStore interface extending GameState with actions.
- *
- * INTERVIEW TIP:
- * TypeScript interfaces ensure type safety. The store interface
- * combines state (GameState) with actions (methods). This pattern
- * makes the API clear and enables autocomplete in IDEs.
- */
+/** Store shape: game state plus internal AI state and the actions. */
 interface GameStore extends GameState {
-  // Internal AI state (not part of public GameState)
   aiHuntState: AIHuntState;
 
-  // ========== ACTIONS ==========
-  // Each action is a function that updates state
-
-  /** Select a ship for placement */
   selectShip: (ship: ShipType | null) => void;
-
-  /** Toggle ship orientation (horizontal/vertical) */
   toggleOrientation: () => void;
-
-  /** Place the selected ship at position */
   placePlayerShip: (position: Position) => boolean;
-
-  /** Remove a placed ship (during setup) */
   removePlayerShip: (shipId: string) => void;
-
-  /** Randomly place all ships */
   randomizePlacement: () => void;
-
-  /** Clear all ship placements */
   clearPlacement: () => void;
-
-  /** Start the game (transition from setup to playing) */
   startGame: () => void;
-
-  /** Player fires at AI board */
   playerShoot: (position: Position) => void;
-
-  /** AI takes its turn */
   aiTurn: () => void;
-
-  /** Reset game to initial state */
   resetGame: () => void;
-
-  /** Toggle sound effects on/off */
   toggleSound: () => void;
-
-  /** Toggle dark/light theme */
   toggleTheme: () => void;
-
-  /** Set animation state (used for timing) */
   setAnimating: (isAnimating: boolean) => void;
 }
 
-/**
- * Main game store created with Zustand.
- *
- * STRUCTURE:
- * - create<GameStore>() - Creates a typed store
- * - persist() - Middleware that saves to localStorage
- * - (set, get) => ({...}) - State and actions definition
- *
- * INTERVIEW TIP:
- * Zustand uses the "set" function to update state. Always use it
- * instead of mutating state directly. The "get" function reads
- * current state inside actions.
- *
- * PERSIST MIDDLEWARE:
- * - name: localStorage key
- * - partialize: Only persist selected fields (settings, not game state)
- */
 export const useGameStore = create<GameStore>()(
   persist(
     (set, get) => ({
-      // ==========================================
-      // INITIAL STATE
-      // ==========================================
-
-      /**
-       * Game phase: 'setup' | 'playing' | 'gameOver'
-       * Controls which UI is shown
-       */
+      // ----- Initial state -----
       phase: 'setup',
-
-      /**
-       * Current turn: 'player' | 'ai'
-       * Determines who can act
-       */
       currentTurn: 'player',
-
-      /**
-       * Winner when game is over
-       */
       winner: null,
 
-      // ----- Player State -----
       playerBoard: createEmptyBoard(),
       playerShips: [],
       playerStats: createEmptyStats(),
 
-      // ----- AI State -----
       aiBoard: createEmptyBoard(),
       aiShips: [],
       aiStats: createEmptyStats(),
 
-      // ----- UI State -----
-      selectedShip: null, // Currently selected ship for placement
+      selectedShip: null,
       shipOrientation: 'horizontal',
-      isAnimating: false, // Prevents input during animations
-      lastShot: null, // Last shot result (for UI feedback)
+      isAnimating: false,
+      lastShot: null,
 
-      // ----- Settings (persisted) -----
       soundEnabled: true,
       theme: 'dark',
 
-      // ----- Internal AI State -----
       aiHuntState: createAIHuntState(),
 
-      // ==========================================
-      // ACTIONS
-      // ==========================================
+      // ----- Actions -----
 
-      /**
-       * Selects a ship for placement.
-       * Pass null to deselect.
-       *
-       * @param {ShipType | null} ship - Ship to select
-       */
       selectShip: (ship) => set({ selectedShip: ship }),
 
-      /**
-       * Toggles ship orientation between horizontal and vertical.
-       * Plays rotation sound effect.
-       *
-       * INTERVIEW TIP:
-       * This pattern of playing sound inside action keeps
-       * side effects centralized in the store.
-       */
       toggleOrientation: () => {
         playSound('rotate');
         set((state) => ({
@@ -212,21 +85,8 @@ export const useGameStore = create<GameStore>()(
       },
 
       /**
-       * Places the selected ship at the given position.
-       *
-       * LOGIC:
-       * 1. Check if ship is selected and we're in setup phase
-       * 2. If ship already placed, remove it first (repositioning)
-       * 3. Attempt to place at new position
-       * 4. If successful, update board and ships, clear selection
-       *
-       * @param {Position} position - Where to place the ship
-       * @returns {boolean} True if placement succeeded
-       *
-       * INTERVIEW TIP:
-       * Returning boolean allows UI to show feedback.
-       * The repositioning logic (remove then add) enables
-       * drag-and-drop style placement.
+       * Places the selected ship, repositioning it if already placed.
+       * Returns true on success so the UI can react.
        */
       placePlayerShip: (position) => {
         const state = get();
@@ -234,10 +94,9 @@ export const useGameStore = create<GameStore>()(
 
         if (!selectedShip || state.phase !== 'setup') return false;
 
-        // Check if this ship is already placed (repositioning)
+        // Repositioning: remove the existing placement, then place again.
         const existingShip = playerShips.find((s) => s.id === selectedShip.id);
         if (existingShip) {
-          // Remove existing placement first
           const boardWithoutShip = removeShip(playerBoard, selectedShip.id);
           const result = placeShip(boardWithoutShip, selectedShip, position, shipOrientation);
 
@@ -253,7 +112,7 @@ export const useGameStore = create<GameStore>()(
           return false;
         }
 
-        // New ship placement
+        // New placement.
         const result = placeShip(playerBoard, selectedShip, position, shipOrientation);
         if (result) {
           playSound('place');
@@ -267,11 +126,6 @@ export const useGameStore = create<GameStore>()(
         return false;
       },
 
-      /**
-       * Removes a ship from player's board during setup.
-       *
-       * @param {string} shipId - ID of ship to remove
-       */
       removePlayerShip: (shipId) => {
         const state = get();
         if (state.phase !== 'setup') return;
@@ -282,10 +136,6 @@ export const useGameStore = create<GameStore>()(
         });
       },
 
-      /**
-       * Randomly places all ships on the player's board.
-       * Uses the placeShipsRandomly utility function.
-       */
       randomizePlacement: () => {
         const state = get();
         if (state.phase !== 'setup') return;
@@ -299,9 +149,6 @@ export const useGameStore = create<GameStore>()(
         });
       },
 
-      /**
-       * Clears all ship placements from player's board.
-       */
       clearPlacement: () => {
         const state = get();
         if (state.phase !== 'setup') return;
@@ -314,24 +161,14 @@ export const useGameStore = create<GameStore>()(
       },
 
       /**
-       * Starts the game.
-       *
-       * LOGIC:
-       * 1. Verify all ships are placed
-       * 2. Generate AI's ship placement
-       * 3. Initialize stats with start time
-       * 4. Transition to playing phase
-       *
-       * INTERVIEW TIP:
-       * Validation before state transition prevents invalid game states.
-       * The AI ships are placed here (not during setup) so player
-       * can't see them being placed.
+       * Starts the game once all ships are placed: generates the AI fleet,
+       * initialises stats, and moves to the playing phase.
        */
       startGame: () => {
         const state = get();
         if (state.playerShips.length !== SHIP_TYPES.length) return;
 
-        // Place AI ships randomly
+        // AI ships are placed here (not during setup) so they stay hidden.
         const { board: aiBoard, ships: aiShips } = placeShipsRandomly();
 
         playSound('click');
@@ -347,39 +184,21 @@ export const useGameStore = create<GameStore>()(
       },
 
       /**
-       * Player fires a shot at the AI's board.
-       *
-       * LOGIC:
-       * 1. Validate: correct phase, player's turn, not animating
-       * 2. Validate: cell not already shot
-       * 3. Process the shot
-       * 4. Play appropriate sound
-       * 5. Update stats
-       * 6. Check win condition
-       * 7. Switch to AI turn (or end game)
-       *
-       * @param {Position} position - Where to shoot
-       *
-       * INTERVIEW TIP:
-       * This is a complex action with multiple side effects.
-       * Breaking it into clear steps makes it maintainable.
-       * The early returns (guard clauses) prevent invalid actions.
+       * Player fires at the AI board: guards the turn, processes the shot,
+       * updates stats, then either ends the game or hands over to the AI.
        */
       playerShoot: (position) => {
         const state = get();
 
-        // Guard clauses - validate action is allowed
         if (state.phase !== 'playing' || state.currentTurn !== 'player' || state.isAnimating)
           return;
 
-        // Check if already shot this cell
+        // Ignore cells that were already shot.
         const cell = state.aiBoard[position.row][position.col];
         if (cell.state === 'hit' || cell.state === 'miss' || cell.state === 'sunk') return;
 
-        // Process the shot
         const { board, ships, result } = processShot(state.aiBoard, state.aiShips, position);
 
-        // Play appropriate sound effect
         if (result === 'sunk') {
           playSound('sunk');
         } else if (result === 'hit') {
@@ -388,7 +207,6 @@ export const useGameStore = create<GameStore>()(
           playSound('miss');
         }
 
-        // Update statistics
         const newStats: GameStats = {
           ...state.playerStats,
           shotsFired: state.playerStats.shotsFired + 1,
@@ -397,7 +215,6 @@ export const useGameStore = create<GameStore>()(
           shipsDestroyed: state.playerStats.shipsDestroyed + (result === 'sunk' ? 1 : 0),
         };
 
-        // Check win condition
         if (areAllShipsSunk(ships)) {
           playSound('victory');
           set({
@@ -412,7 +229,6 @@ export const useGameStore = create<GameStore>()(
           return;
         }
 
-        // Continue game - switch to AI turn
         set({
           aiBoard: board,
           aiShips: ships,
@@ -424,36 +240,22 @@ export const useGameStore = create<GameStore>()(
       },
 
       /**
-       * AI takes its turn.
-       *
-       * LOGIC:
-       * 1. Call the AI (Hunt/Target) to get the target position
-       * 2. Process the shot on player's board
-       * 3. Update AI hunt state based on result
-       * 4. Update stats
-       * 5. Check win condition
-       * 6. Switch back to player turn (or end game)
-       *
-       * INTERVIEW TIP:
-       * The AI turn is triggered by useEffect in App.tsx
-       * with a delay for dramatic effect. This separation
-       * keeps the store synchronous and predictable.
+       * AI's turn: pick a target via the Hunt/Target logic, process the shot,
+       * update its state and stats, then end the game or hand back to the player.
+       * Triggered from App.tsx on a delay so the store stays synchronous.
        */
       aiTurn: () => {
         const state = get();
         if (state.phase !== 'playing' || state.currentTurn !== 'ai') return;
 
-        // Get AI's target position (Hunt/Target algorithm)
         const { position, newState } = getAIShot(state.playerBoard, state.aiHuntState);
 
-        // Process the shot
         const { board, ships, result } = processShot(
           state.playerBoard,
           state.playerShips,
           position
         );
 
-        // Play sound
         if (result === 'sunk') {
           playSound('sunk');
         } else if (result === 'hit') {
@@ -462,10 +264,8 @@ export const useGameStore = create<GameStore>()(
           playSound('miss');
         }
 
-        // Update AI hunt state based on result
         const updatedHuntState = updateAIHuntState(newState, position, result, board);
 
-        // Update AI's statistics
         const newStats: GameStats = {
           ...state.aiStats,
           shotsFired: state.aiStats.shotsFired + 1,
@@ -474,7 +274,6 @@ export const useGameStore = create<GameStore>()(
           shipsDestroyed: state.aiStats.shipsDestroyed + (result === 'sunk' ? 1 : 0),
         };
 
-        // Check win condition (AI wins)
         if (areAllShipsSunk(ships)) {
           playSound('defeat');
           set({
@@ -490,7 +289,6 @@ export const useGameStore = create<GameStore>()(
           return;
         }
 
-        // Continue game - switch back to player turn
         set({
           playerBoard: board,
           playerShips: ships,
@@ -502,10 +300,7 @@ export const useGameStore = create<GameStore>()(
         });
       },
 
-      /**
-       * Resets the game to initial state.
-       * Called when clicking "Play Again".
-       */
+      /** Resets everything back to a fresh setup phase. */
       resetGame: () => {
         playSound('click');
         set({
@@ -526,34 +321,22 @@ export const useGameStore = create<GameStore>()(
         });
       },
 
-      /**
-       * Toggles sound effects on/off.
-       * Also updates the sound module's enabled flag.
-       */
       toggleSound: () => {
         const newEnabled = !get().soundEnabled;
         setSoundEnabled(newEnabled);
         set({ soundEnabled: newEnabled });
       },
 
-      /**
-       * Toggles between dark and light themes.
-       */
       toggleTheme: () => {
         set((state) => ({ theme: state.theme === 'dark' ? 'light' : 'dark' }));
       },
 
-      /**
-       * Sets the animation state.
-       * Used to prevent user input during animations.
-       */
       setAnimating: (isAnimating) => set({ isAnimating }),
     }),
     {
-      // Persist middleware configuration
       name: 'battleship-settings', // localStorage key
+      // Persist settings only, never the in-progress game.
       partialize: (state) => ({
-        // Only persist settings, not game state
         soundEnabled: state.soundEnabled,
         theme: state.theme,
       }),
