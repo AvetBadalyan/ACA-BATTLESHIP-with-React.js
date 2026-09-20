@@ -153,6 +153,75 @@ When a player clicks a cell to shoot:
        └── No → Switch to AI turn
 ```
 
+## 🧭 Learning Guide: Follow One Shot Through the Code
+
+> If the codebase feels overwhelming, read this section. It traces a single
+> click from the screen all the way to a state change and back, naming the
+> real files and functions. Once this one path makes sense, the rest of the
+> app is just variations of it.
+
+### The one idea that unlocks everything
+
+**The board is data, not pixels.** A board is a 10×10 array of arrays
+(`Cell[][]`). Each cell is a small object with a `state`:
+`'empty' | 'ship' | 'hit' | 'miss' | 'sunk'`. That's the whole game state of a
+grid. Everything else — drawing, sounds, the AI — just reads or changes those
+cell states. You never "hit a battleship" by changing colors; you change
+`board[row][col].state` from `'ship'` to `'hit'`, and React redraws because the
+data changed.
+
+There are **two boards**: `playerBoard` holds your ships (the AI shoots at it),
+`aiBoard` holds the AI's ships (you shoot at it). Player and AI use the **same**
+shot logic, just aimed at the opposite board.
+
+### Step by step: clicking an enemy cell to fire
+
+1. **`components/Cell/Cell.tsx`** — you click a cell on "Enemy Waters". The
+   cell calls the `onClick` it was given. The Cell is "dumb": it just reports
+   the click and draws whatever `state` it holds. It decides nothing about the
+   game.
+
+2. **`components/Board/Board.tsx`** — the board rendered each cell in a double
+   `.map()` (rows × columns) and wired each one's click to
+   `handleCellClick({ row, col })`. For the enemy board, that calls the
+   `onCellClick` prop, which is the store's `playerShoot`.
+
+3. **`store/gameStore.ts` → `playerShoot(position)`** — this is the brain of a
+   turn. It guards against invalid clicks (not your turn, already-shot cell,
+   mid-animation), then calls `processShot` to compute the result.
+
+4. **`utils/board.ts` → `processShot(board, ships, position)`** — pure logic,
+   no React. It looks at `aiBoard[row][col]`: if it's a `'ship'` it becomes
+   `'hit'` (and if that ship's hit count now equals its size, all its cells
+   become `'sunk'`); otherwise it becomes `'miss'`. It returns a **new** board
+   (immutability — see the Design Patterns section).
+
+5. Back in `playerShoot`, the store plays a sound (`utils/sounds.ts`), updates
+   stats (shots/hits/accuracy), checks the win condition
+   (`areAllShipsSunk`), stores the new board, and flips `currentTurn` to
+   `'ai'`.
+
+6. **React re-renders.** Because the store state changed, any component reading
+   that state re-renders. The clicked cell now has `state: 'hit'` or `'miss'`,
+   so `Cell.tsx` draws the 💥 or splash. You didn't touch the DOM — the data
+   change did it.
+
+7. **The AI's turn.** In `App.tsx`, a `useEffect` watches `currentTurn`. When it
+   becomes `'ai'`, it waits ~1s (for drama) then calls `aiTurn()`. That calls
+   `getAIShot(playerBoard, huntState)` to pick a cell, then runs the **same**
+   `processShot` — this time against your `playerBoard` — and flips the turn
+   back to `'player'`. Repeat until one side's ships are all sunk.
+
+### How to explain it in one breath
+
+> "The board is a 2D array of cell objects. Clicking a cell calls a store
+> action, `playerShoot`, which runs a pure `processShot` function to mark the
+> cell hit/miss/sunk and returns a new board. React re-renders from that new
+> state. The AI turn is triggered by a `useEffect` watching whose turn it is,
+> and it reuses the exact same `processShot` against my board."
+
+---
+
 ## 🤖 AI Algorithm: Hunt/Target
 
 The AI is a two-mode state machine. It hunts randomly until it hits a ship,

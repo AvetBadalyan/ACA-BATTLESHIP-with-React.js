@@ -3,6 +3,10 @@
 A modern, single-player Battleship game built with React 19, TypeScript, and Vite. Challenge yourself against an AI opponent that uses the classic Hunt/Target targeting algorithm.
 
 <p align="center">
+  <strong><a href="https://aca-battleship.vercel.app/">🎮 Play the live demo »</a></strong>
+</p>
+
+<p align="center">
   <img src="./src/assets/screenshots/01-setup-initial.png" alt="Setup Phase" width="800" />
 </p>
 
@@ -213,16 +217,16 @@ This project demonstrates several skills valuable for interviews:
 
 ### Technical Skills Demonstrated
 
-| Skill                | Implementation                                  |
-| -------------------- | ----------------------------------------------- |
-| **React**            | Functional components, hooks, state management  |
-| **TypeScript**       | Strict typing, interfaces, generics             |
-| **State Management** | Zustand with persistence middleware             |
-| **Algorithms**       | AI targeting (random, heuristic, probabilistic) |
-| **Data Structures**  | 2D arrays, queues, stacks                       |
-| **CSS**              | Variables, modules, responsive design           |
-| **Web APIs**         | Web Audio API for sound synthesis               |
-| **Build Tools**      | Vite configuration, TypeScript setup            |
+| Skill                | Implementation                                 |
+| -------------------- | ---------------------------------------------- |
+| **React**            | Functional components, hooks, state management |
+| **TypeScript**       | Strict typing, interfaces, generics            |
+| **State Management** | Zustand with persistence middleware            |
+| **Algorithms**       | Hunt/Target AI (state machine + queue search)  |
+| **Data Structures**  | 2D arrays, queue, stack                        |
+| **CSS**              | Variables, modules, responsive design          |
+| **Web APIs**         | Web Audio API for sound synthesis              |
+| **Build Tools**      | Vite configuration, TypeScript setup           |
 
 ### Common Interview Questions
 
