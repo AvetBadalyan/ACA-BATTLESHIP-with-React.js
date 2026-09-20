@@ -14,7 +14,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const SCREENSHOTS_DIR = path.join(__dirname, '../src/assets/screenshots');
-const BASE_URL = 'http://localhost:5174';
+const BASE_URL = process.env.BASE_URL || 'http://localhost:5173';
 
 // Screen sizes for responsive testing
 const VIEWPORTS = {

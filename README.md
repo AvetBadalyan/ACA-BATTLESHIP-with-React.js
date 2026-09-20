@@ -105,7 +105,7 @@ The game adapts to all screen sizes:
 ```bash
 # Clone the repository
 git clone https://github.com/AvetBadalyan/ACA-BATTLESHIP-with-React.js.git
-cd game-front
+cd ACA-BATTLESHIP-with-React.js/game-front
 
 # Install dependencies
 npm install
@@ -311,27 +311,29 @@ The sounds are created by combining oscillators (for tones) and noise generators
 <details>
 <summary><strong>Q: How would you add online multiplayer?</strong></summary>
 
-The architecture is already prepared:
+The architecture makes this a small change:
 
-1. **Opponent Interface** - Currently AIOpponent, could add RemoteOpponent
-2. **State Structure** - Already separates player/opponent data
-3. **Action Pattern** - `playerShoot()` could send to server instead of local AI
-
-Implementation:
+1. **State Structure** - Already separates player and opponent data
+2. **Isolated AI turn** - `aiTurn()` in the store is the only place that picks the opponent's move, and it delegates to the pure `getAIShot()` function
+3. **Next step** - Introduce an `Opponent` interface so the local AI and a future remote player are interchangeable
 
 ```typescript
 interface Opponent {
   makeMove(board: Board): Promise<Position>;
 }
 
+// Wraps the existing getAIShot() function
+class AIOpponent implements Opponent { ... }
+
+// Future: sends board state and awaits the other player's move
 class RemoteOpponent implements Opponent {
   async makeMove(board: Board): Promise<Position> {
-    // Send board state via WebSocket
-    // Wait for opponent's move
     return await this.socket.receive();
   }
 }
 ```
+
+> Note: the `Opponent` interface above does not exist yet — it's the refactor I'd do to add multiplayer. Today the AI is a pure function called from `aiTurn()`.
 
 </details>
 

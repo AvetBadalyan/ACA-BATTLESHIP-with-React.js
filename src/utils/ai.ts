@@ -133,7 +133,7 @@ function getMediumShot(
   board: Board,
   huntState: AIHuntState
 ): { position: Position; newState: AIHuntState } {
-  let newState = { ...huntState };
+  const newState = { ...huntState };
 
   // TARGET MODE: Process the queue of suspected ship cells
   while (newState.targetQueue.length > 0) {
@@ -284,7 +284,7 @@ function getHardShot(
   huntState: AIHuntState,
   remainingShipSizes: number[]
 ): { position: Position; newState: AIHuntState } {
-  let newState = { ...huntState, targetQueue: [...huntState.targetQueue] };
+  const newState = { ...huntState, targetQueue: [...huntState.targetQueue] };
 
   // If in target mode with valid targets, use them first
   if (newState.mode === 'target' && newState.targetQueue.length > 0) {

@@ -156,6 +156,7 @@ When a player clicks a cell to shoot:
 ## 🤖 AI Algorithm Comparison
 
 ### Easy Mode: Random
+
 ```
 algorithm EasyAI(board):
     available = getAllUntriedCells(board)
@@ -168,11 +169,12 @@ Characteristics:
 ```
 
 ### Medium Mode: Hunt/Target
+
 ```
 algorithm MediumAI(board, state):
     if state.mode == 'target' AND state.queue not empty:
         return state.queue.dequeue()
-    
+
     // Hunt mode: random shot
     position = randomUntriedCell(board)
     return position
@@ -180,7 +182,7 @@ algorithm MediumAI(board, state):
 onHit(position):
     state.mode = 'target'
     state.queue.enqueue(adjacentCells(position))
-    
+
 onSunk():
     state.mode = 'hunt'
     state.queue.clear()
@@ -192,24 +194,25 @@ Characteristics:
 ```
 
 ### Hard Mode: Probability Density
+
 ```
 algorithm HardAI(board, remainingShips):
     if state.mode == 'target' AND state.queue not empty:
         return state.queue.dequeue()
-    
+
     // Calculate probability for each cell
     probMap = initializeZeros(10, 10)
-    
+
     for each ship in remainingShips:
         for each possible placement:
             if placement is valid:
                 for each cell in placement:
                     probMap[cell] += 1
-    
+
     // Add center bonus
     for each cell:
         probMap[cell] += centerBonus(cell)
-    
+
     // Pick highest probability cell
     return argmax(probMap)
 
@@ -228,24 +231,24 @@ GameState {
   difficulty: 'easy' | 'medium' | 'hard'
   currentTurn: 'player' | 'ai'
   winner: 'player' | 'ai' | null
-  
+
   // Player data
   playerBoard: Cell[10][10]
   playerShips: Ship[5]
   playerStats: { shotsFired, hits, misses, ... }
-  
+
   // AI data
   aiBoard: Cell[10][10]
   aiShips: Ship[5]
   aiStats: { ... }
   aiHuntState: { mode, targetQueue, hitStack, ... }
-  
+
   // UI state
   selectedShip: ShipType | null
   shipOrientation: 'horizontal' | 'vertical'
   isAnimating: boolean
   lastShot: { position, result } | null
-  
+
   // Settings (persisted to localStorage)
   soundEnabled: boolean
   theme: 'dark' | 'light'
@@ -255,28 +258,34 @@ GameState {
 ## 🧩 Key Design Patterns Used
 
 ### 1. **Immutability Pattern**
+
 All state updates create new objects instead of mutating:
+
 ```typescript
 // ❌ Bad: Mutation
 board[row][col].state = 'hit';
 
 // ✅ Good: Immutable update
-const newBoard = board.map(row => row.map(cell => ({...cell})));
+const newBoard = board.map((row) => row.map((cell) => ({ ...cell })));
 newBoard[row][col] = { ...newBoard[row][col], state: 'hit' };
 ```
 
 ### 2. **State Machine Pattern**
+
 Game phases and AI modes are explicit states with defined transitions:
+
 ```typescript
 // Phase transitions
 'setup' → 'playing' → 'gameOver' → 'setup'
 
-// AI mode transitions  
+// AI mode transitions
 'hunt' → (on hit) → 'target' → (on sunk) → 'hunt'
 ```
 
 ### 3. **Factory Pattern**
+
 Functions create objects with consistent structure:
+
 ```typescript
 function createEmptyBoard(): Board { ... }
 function createEmptyStats(): GameStats { ... }
@@ -284,7 +293,9 @@ function createAIHuntState(): AIHuntState { ... }
 ```
 
 ### 4. **Strategy Pattern**
+
 AI difficulty selects different algorithms at runtime:
+
 ```typescript
 function getAIShot(board, difficulty, ...) {
   switch (difficulty) {
@@ -296,14 +307,18 @@ function getAIShot(board, difficulty, ...) {
 ```
 
 ### 5. **Singleton Pattern**
+
 Sound manager is a single instance:
+
 ```typescript
 export const soundManager = new SoundManager();
 // Used throughout: soundManager.play('hit')
 ```
 
 ### 6. **Observer Pattern**
+
 React components subscribe to store changes via Zustand:
+
 ```typescript
 const { phase, playerBoard } = useGameStore();
 // Component re-renders when these values change
@@ -311,16 +326,16 @@ const { phase, playerBoard } = useGameStore();
 
 ## 🎯 Component Responsibilities
 
-| Component | Responsibility |
-|-----------|---------------|
-| `App` | Route between phases, orchestrate AI turns |
-| `Board` | Render 10x10 grid, handle ship preview on hover |
-| `Cell` | Render single cell, animations for hit/miss/sunk |
-| `ShipSelector` | Ship selection UI, orientation toggle, randomize |
-| `GameStats` | Display shots, accuracy, ships remaining |
-| `Header` | Difficulty select, sound/theme toggles |
-| `TurnIndicator` | Show current turn, last shot result |
-| `GameOverModal` | Victory/defeat display, play again button |
+| Component       | Responsibility                                   |
+| --------------- | ------------------------------------------------ |
+| `App`           | Route between phases, orchestrate AI turns       |
+| `Board`         | Render 10x10 grid, handle ship preview on hover  |
+| `Cell`          | Render single cell, animations for hit/miss/sunk |
+| `ShipSelector`  | Ship selection UI, orientation toggle, randomize |
+| `GameStats`     | Display shots, accuracy, ships remaining         |
+| `Header`        | Difficulty select, sound/theme toggles           |
+| `TurnIndicator` | Show current turn, last shot result              |
+| `GameOverModal` | Victory/defeat display, play again button        |
 
 ## 🔊 Sound Generation
 
@@ -330,7 +345,7 @@ Sounds are synthesized using Web Audio API (no audio files):
 // Explosion (hit)
 oscillator(80Hz, sawtooth) + whiteNoise(500Hz lowpass)
 
-// Splash (miss)  
+// Splash (miss)
 whiteNoise(800Hz lowpass) + oscillator(200Hz, sine)
 
 // Victory
@@ -346,23 +361,24 @@ CSS variables adapt to screen size:
 
 ```css
 :root {
-  --cell-size: 40px;  /* Desktop */
+  --cell-size: 40px; /* Desktop */
 }
 
 @media (max-width: 768px) {
   :root {
-    --cell-size: 32px;  /* Tablet */
+    --cell-size: 32px; /* Tablet */
   }
 }
 
 @media (max-width: 480px) {
   :root {
-    --cell-size: 28px;  /* Mobile */
+    --cell-size: 28px; /* Mobile */
   }
 }
 ```
 
 Layout changes:
+
 - **Desktop**: Boards side-by-side
 - **Mobile**: Boards stacked vertically
 
@@ -395,23 +411,27 @@ E2E Tests:
 ## 🔮 Future Enhancement Architecture
 
 ### Multiplayer Support
+
 ```
 Current:
   Player ←→ LocalAI
 
 Future:
   Player ←→ WebSocket ←→ Server ←→ WebSocket ←→ Player
-  
-  // Opponent interface allows swapping implementations
+
+  // Today the AI is a pure function (getAIShot) called from the
+  // store's aiTurn() action. To add multiplayer, introduce an
+  // Opponent interface and move turn-taking behind it:
   interface Opponent {
-    makeMove(board: Board): Position;
+    makeMove(board: Board): Promise<Position>;
   }
-  
-  class AIOpponent implements Opponent { ... }      // Current
-  class RemoteOpponent implements Opponent { ... }  // Future
+
+  class AIOpponent implements Opponent { ... }      // wraps getAIShot()
+  class RemoteOpponent implements Opponent { ... }  // sends/receives via WebSocket
 ```
 
 ### Replay System
+
 ```typescript
 // Current lastShot only tracks one shot
 // Future: Track all shots for replay
@@ -426,16 +446,21 @@ interface GameHistory {
 ## 💡 Interview Quick Reference
 
 **Q: Why Zustand over Redux or Context?**
+
 > Zustand is simpler (no boilerplate), more performant (partial subscriptions), and doesn't require Provider wrappers. For a game with frequent state updates, this efficiency matters.
 
 **Q: Explain the AI difficulty levels.**
+
 > Easy uses random targeting. Medium uses Hunt/Target algorithm - random until hit, then targets adjacent cells. Hard uses probability density mapping - calculates where ships are most likely based on remaining possibilities.
 
 **Q: How is state managed immutably?**
+
 > All state updates use spread operators or map() to create new objects. This enables React's change detection and allows for features like undo/redo.
 
 **Q: Why Web Audio API instead of audio files?**
+
 > Smaller bundle size, no HTTP requests, works offline, and sounds can be parameterized at runtime. It demonstrates understanding of browser APIs.
 
 **Q: How would you add multiplayer?**
-> The game logic is already separated from the opponent implementation. I'd create a RemoteOpponent class that sends moves via WebSocket and receives opponent moves the same way. The store actions would remain unchanged.
+
+> The AI turn is isolated in one place: the store's `aiTurn()` action calls the pure `getAIShot()` function. I'd extract an `Opponent` interface with a `makeMove()` method, wrap the current AI in an `AIOpponent`, and add a `RemoteOpponent` that sends/receives moves over WebSocket. Because `getAIShot()` is already pure and turn-taking lives in one action, little of the game logic needs to change.
