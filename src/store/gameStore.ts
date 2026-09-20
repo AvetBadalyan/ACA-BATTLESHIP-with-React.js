@@ -42,7 +42,7 @@ import {
   processShot,
   removeShip,
 } from '@/utils/board';
-import { soundManager } from '@/utils/sounds';
+import { playSound, setSoundEnabled } from '@/utils/sounds';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -205,7 +205,7 @@ export const useGameStore = create<GameStore>()(
        * side effects centralized in the store.
        */
       toggleOrientation: () => {
-        soundManager.play('rotate');
+        playSound('rotate');
         set((state) => ({
           shipOrientation: state.shipOrientation === 'horizontal' ? 'vertical' : 'horizontal',
         }));
@@ -242,7 +242,7 @@ export const useGameStore = create<GameStore>()(
           const result = placeShip(boardWithoutShip, selectedShip, position, shipOrientation);
 
           if (result) {
-            soundManager.play('place');
+            playSound('place');
             set({
               playerBoard: result.board,
               playerShips: playerShips.map((s) => (s.id === selectedShip.id ? result.ship : s)),
@@ -256,7 +256,7 @@ export const useGameStore = create<GameStore>()(
         // New ship placement
         const result = placeShip(playerBoard, selectedShip, position, shipOrientation);
         if (result) {
-          soundManager.play('place');
+          playSound('place');
           set({
             playerBoard: result.board,
             playerShips: [...playerShips, result.ship],
@@ -291,7 +291,7 @@ export const useGameStore = create<GameStore>()(
         if (state.phase !== 'setup') return;
 
         const { board, ships } = placeShipsRandomly();
-        soundManager.play('place');
+        playSound('place');
         set({
           playerBoard: board,
           playerShips: ships,
@@ -334,7 +334,7 @@ export const useGameStore = create<GameStore>()(
         // Place AI ships randomly
         const { board: aiBoard, ships: aiShips } = placeShipsRandomly();
 
-        soundManager.play('click');
+        playSound('click');
         set({
           phase: 'playing',
           aiBoard,
@@ -381,11 +381,11 @@ export const useGameStore = create<GameStore>()(
 
         // Play appropriate sound effect
         if (result === 'sunk') {
-          soundManager.play('sunk');
+          playSound('sunk');
         } else if (result === 'hit') {
-          soundManager.play('hit');
+          playSound('hit');
         } else {
-          soundManager.play('miss');
+          playSound('miss');
         }
 
         // Update statistics
@@ -399,7 +399,7 @@ export const useGameStore = create<GameStore>()(
 
         // Check win condition
         if (areAllShipsSunk(ships)) {
-          soundManager.play('victory');
+          playSound('victory');
           set({
             aiBoard: board,
             aiShips: ships,
@@ -455,11 +455,11 @@ export const useGameStore = create<GameStore>()(
 
         // Play sound
         if (result === 'sunk') {
-          soundManager.play('sunk');
+          playSound('sunk');
         } else if (result === 'hit') {
-          soundManager.play('hit');
+          playSound('hit');
         } else {
-          soundManager.play('miss');
+          playSound('miss');
         }
 
         // Update AI hunt state based on result
@@ -476,7 +476,7 @@ export const useGameStore = create<GameStore>()(
 
         // Check win condition (AI wins)
         if (areAllShipsSunk(ships)) {
-          soundManager.play('defeat');
+          playSound('defeat');
           set({
             playerBoard: board,
             playerShips: ships,
@@ -507,7 +507,7 @@ export const useGameStore = create<GameStore>()(
        * Called when clicking "Play Again".
        */
       resetGame: () => {
-        soundManager.play('click');
+        playSound('click');
         set({
           phase: 'setup',
           currentTurn: 'player',
@@ -528,11 +528,11 @@ export const useGameStore = create<GameStore>()(
 
       /**
        * Toggles sound effects on/off.
-       * Also updates the soundManager singleton.
+       * Also updates the sound module's enabled flag.
        */
       toggleSound: () => {
         const newEnabled = !get().soundEnabled;
-        soundManager.setEnabled(newEnabled);
+        setSoundEnabled(newEnabled);
         set({ soundEnabled: newEnabled });
       },
 

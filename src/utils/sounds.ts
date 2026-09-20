@@ -1,271 +1,67 @@
 /**
- * @fileoverview Sound Effects Manager using Web Audio API
+ * @fileoverview Sound effects using the browser's Audio API.
  *
- * This module provides synthesized sound effects without external audio files.
- * All sounds are generated programmatically using oscillators and noise.
- *
- * @module utils/sounds
+ * Sounds are short pre-recorded files in src/assets/sounds. We import each
+ * file so Vite bundles and cache-hashes it, then keep one Audio object per
+ * sound and a small playSound() function that plays the requested one.
+ * currentTime is reset first so the same sound can retrigger immediately
+ * (e.g. rapid shots).
  *
  * INTERVIEW NOTES:
- * ================
- * This demonstrates:
- *
- * 1. WEB AUDIO API: Low-level audio synthesis in the browser
- *    - AudioContext: The main audio processing graph
- *    - OscillatorNode: Generates tones (sine, square, sawtooth waves)
- *    - GainNode: Controls volume and creates envelopes
- *    - BiquadFilterNode: Filters frequencies (like EQ)
- *
- * 2. SINGLETON PATTERN: One SoundManager instance for the entire app
- *
- * 3. LAZY INITIALIZATION: AudioContext created on first use
- *    (required by browsers - can't create before user interaction)
- *
- * 4. ENCAPSULATION: Complex audio logic hidden behind simple play() API
+ * - No classes / no `this`: just an object of Audio instances + functions.
+ * - Files are imported (not hardcoded URLs) so the bundler resolves the
+ *   correct hashed path at build time.
+ * - play() can reject (e.g. before the first user interaction); we swallow
+ *   that rejection so it never crashes the game.
  */
 
-/** Sound effect types available in the game */
-type SoundType = 'hit' | 'miss' | 'sunk' | 'victory' | 'defeat' | 'place' | 'rotate' | 'click';
+import clickUrl from '@/assets/sounds/click.wav';
+import defeatUrl from '@/assets/sounds/defeat.wav';
+import hitUrl from '@/assets/sounds/hit.wav';
+import missUrl from '@/assets/sounds/miss.wav';
+import placeUrl from '@/assets/sounds/place.wav';
+import rotateUrl from '@/assets/sounds/rotate.wav';
+import sunkUrl from '@/assets/sounds/sunk.wav';
+import victoryUrl from '@/assets/sounds/victory.wav';
+
+export type SoundName =
+  'hit' | 'miss' | 'sunk' | 'victory' | 'defeat' | 'place' | 'rotate' | 'click';
+
+/** One Audio object per sound, created once and reused. */
+const sounds: Record<SoundName, HTMLAudioElement> = {
+  hit: new Audio(hitUrl),
+  miss: new Audio(missUrl),
+  sunk: new Audio(sunkUrl),
+  victory: new Audio(victoryUrl),
+  defeat: new Audio(defeatUrl),
+  place: new Audio(placeUrl),
+  rotate: new Audio(rotateUrl),
+  click: new Audio(clickUrl),
+};
+
+/** Master volume for all effects (0-1). */
+Object.values(sounds).forEach((audio) => {
+  audio.volume = 0.5;
+});
+
+let soundEnabled = true;
 
 /**
- * Sound Manager class using Web Audio API.
- *
- * Generates all sounds programmatically without external files.
- * This approach has several advantages:
- * - No additional HTTP requests
- * - Smaller bundle size
- * - Sounds can be parameterized/modified at runtime
- * - Works offline immediately
- *
- * INTERVIEW TIP:
- * Web Audio API is powerful but complex. The key concepts are:
- * - Audio nodes are connected in a graph (like a signal chain)
- * - Oscillators generate waveforms at specific frequencies
- * - Gain nodes control volume (0 = silent, 1 = full volume)
- * - Everything connects to audioContext.destination (speakers)
+ * Plays a sound effect by name.
+ * Resets currentTime so a repeated sound restarts instead of being ignored.
  */
-class SoundManager {
-  /** Lazily initialized AudioContext */
-  private audioContext: AudioContext | null = null;
+export function playSound(name: SoundName) {
+  if (!soundEnabled) return;
 
-  /** Whether sound effects are enabled */
-  private enabled: boolean = true;
+  const audio = sounds[name];
+  audio.currentTime = 0;
 
-  /** Master volume (0-1) */
-  private volume: number = 0.5;
-
-  /**
-   * Gets or creates the AudioContext.
-   *
-   * AudioContext must be created after user interaction due to
-   * browser autoplay policies. We create it lazily on first sound.
-   *
-   * @returns {AudioContext} The audio context
-   */
-  private getContext(): AudioContext {
-    if (!this.audioContext) {
-      this.audioContext = new AudioContext();
-    }
-    return this.audioContext;
-  }
-
-  /**
-   * Enables or disables all sound effects.
-   * @param {boolean} enabled - Whether sounds should play
-   */
-  setEnabled(enabled: boolean) {
-    this.enabled = enabled;
-  }
-
-  /**
-   * Sets the master volume.
-   * @param {number} volume - Volume level (0-1)
-   */
-  setVolume(volume: number) {
-    this.volume = Math.max(0, Math.min(1, volume));
-  }
-
-  /**
-   * Plays a simple tone using an oscillator.
-   *
-   * @param {number} frequency - Frequency in Hz (e.g., 440 = A4 note)
-   * @param {number} duration - Duration in seconds
-   * @param {OscillatorType} type - Wave shape: 'sine', 'square', 'sawtooth', 'triangle'
-   * @param {boolean} decay - Whether volume should fade out
-   *
-   * INTERVIEW TIP:
-   * Different wave types create different timbres:
-   * - sine: Pure tone, soft (like a flute)
-   * - square: Harsh, buzzy (like old video games)
-   * - sawtooth: Bright, aggressive (like brass)
-   * - triangle: Soft, mellow (between sine and square)
-   */
-  private playTone(
-    frequency: number,
-    duration: number,
-    type: OscillatorType = 'sine',
-    decay = true
-  ) {
-    if (!this.enabled) return;
-
-    const ctx = this.getContext();
-
-    // Create oscillator (generates the tone)
-    const oscillator = ctx.createOscillator();
-
-    // Create gain node (controls volume)
-    const gainNode = ctx.createGain();
-
-    // Connect: oscillator -> gain -> speakers
-    oscillator.connect(gainNode);
-    gainNode.connect(ctx.destination);
-
-    // Configure oscillator
-    oscillator.type = type;
-    oscillator.frequency.setValueAtTime(frequency, ctx.currentTime);
-
-    // Configure volume envelope
-    gainNode.gain.setValueAtTime(this.volume, ctx.currentTime);
-    if (decay) {
-      // Exponential decay creates natural-sounding fade out
-      gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
-    }
-
-    // Start and stop the oscillator
-    oscillator.start(ctx.currentTime);
-    oscillator.stop(ctx.currentTime + duration);
-  }
-
-  /**
-   * Plays white noise (used for explosions, splashes).
-   *
-   * @param {number} duration - Duration in seconds
-   * @param {number} filterFreq - Low-pass filter cutoff frequency
-   *
-   * INTERVIEW TIP:
-   * White noise is generated by filling a buffer with random values.
-   * The low-pass filter removes high frequencies, making it sound
-   * less harsh. Lower cutoff = more "bassy" sound.
-   */
-  private playNoise(duration: number, filterFreq: number = 1000) {
-    if (!this.enabled) return;
-
-    const ctx = this.getContext();
-
-    // Create buffer filled with random samples (white noise)
-    const bufferSize = ctx.sampleRate * duration;
-    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-    const data = buffer.getChannelData(0);
-
-    for (let i = 0; i < bufferSize; i++) {
-      data[i] = Math.random() * 2 - 1; // Random value between -1 and 1
-    }
-
-    // Create buffer source (plays the noise buffer)
-    const noise = ctx.createBufferSource();
-    noise.buffer = buffer;
-
-    // Create low-pass filter (removes harsh high frequencies)
-    const filter = ctx.createBiquadFilter();
-    filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(filterFreq, ctx.currentTime);
-
-    // Create gain for volume control and decay
-    const gainNode = ctx.createGain();
-    gainNode.gain.setValueAtTime(this.volume * 0.5, ctx.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
-
-    // Connect: noise -> filter -> gain -> speakers
-    noise.connect(filter);
-    filter.connect(gainNode);
-    gainNode.connect(ctx.destination);
-
-    noise.start(ctx.currentTime);
-    noise.stop(ctx.currentTime + duration);
-  }
-
-  /**
-   * Plays a sound effect by name.
-   *
-   * Each sound is crafted by combining tones and noise to create
-   * recognizable game audio without any external files.
-   *
-   * @param {SoundType} sound - Name of sound to play
-   *
-   * INTERVIEW TIP:
-   * Sound design is about layering. An "explosion" isn't one sound -
-   * it's a low boom (bass tone) + noise burst + maybe a secondary hit.
-   * setTimeout creates the layered timing.
-   */
-  play(sound: SoundType) {
-    if (!this.enabled) return;
-
-    switch (sound) {
-      case 'hit':
-        // Explosion: low-frequency boom with noise burst
-        this.playTone(80, 0.3, 'sawtooth'); // Deep bass boom
-        this.playNoise(0.4, 500); // Explosion noise
-        setTimeout(() => this.playTone(60, 0.2, 'square'), 100); // Secondary hit
-        break;
-
-      case 'miss':
-        // Water splash: filtered noise with subtle tone
-        this.playNoise(0.5, 800); // Splash noise
-        this.playTone(200, 0.15, 'sine'); // Water "plop"
-        break;
-
-      case 'sunk':
-        // Ship sinking: extended explosion with descending tones
-        this.playTone(80, 0.3, 'sawtooth'); // Initial explosion
-        this.playNoise(0.6, 400); // Debris noise
-        setTimeout(() => this.playTone(150, 0.2, 'square'), 100);
-        setTimeout(() => this.playTone(100, 0.3, 'square'), 200);
-        setTimeout(() => this.playTone(60, 0.4, 'sawtooth'), 350); // Sinking sound
-        break;
-
-      case 'victory':
-        // Victory fanfare: ascending major chord (C-E-G-C)
-        this.playTone(523.25, 0.2, 'square'); // C5
-        setTimeout(() => this.playTone(659.25, 0.2, 'square'), 150); // E5
-        setTimeout(() => this.playTone(783.99, 0.2, 'square'), 300); // G5
-        setTimeout(() => this.playTone(1046.5, 0.5, 'square'), 450); // C6 (octave up)
-        break;
-
-      case 'defeat':
-        // Defeat sound: descending minor (sad progression)
-        this.playTone(440, 0.3, 'sawtooth'); // A4
-        setTimeout(() => this.playTone(349.23, 0.3, 'sawtooth'), 250); // F4
-        setTimeout(() => this.playTone(293.66, 0.4, 'sawtooth'), 500); // D4
-        break;
-
-      case 'place':
-        // Ship placement: positive confirmation click
-        this.playTone(880, 0.08, 'square'); // High click
-        setTimeout(() => this.playTone(1100, 0.1, 'square'), 50); // Higher confirmation
-        break;
-
-      case 'rotate':
-        // Rotation: quick ascending sweep
-        this.playTone(300, 0.1, 'sine');
-        setTimeout(() => this.playTone(500, 0.1, 'sine'), 50);
-        break;
-
-      case 'click':
-        // UI click: simple short tone
-        this.playTone(600, 0.05, 'square');
-        break;
-    }
-  }
+  // play() returns a Promise that can reject (autoplay policy, missing file).
+  // Ignore the rejection so a failed sound never breaks gameplay.
+  void audio.play().catch(() => {});
 }
 
-/**
- * Singleton instance of SoundManager.
- *
- * Exported for use throughout the application.
- *
- * @example
- * import { soundManager } from '@/utils/sounds';
- * soundManager.play('hit');
- * soundManager.setEnabled(false); // Mute
- */
-export const soundManager = new SoundManager();
+/** Enables or disables all sound effects. */
+export function setSoundEnabled(enabled: boolean) {
+  soundEnabled = enabled;
+}

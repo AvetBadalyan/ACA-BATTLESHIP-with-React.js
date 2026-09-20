@@ -2,7 +2,7 @@ import { Board, GameOverModal, GameStats, Header, ShipSelector, TurnIndicator } 
 import { useKeyboard } from '@/hooks';
 import { useGameStore } from '@/store';
 import '@/styles/global.css';
-import { soundManager } from '@/utils/sounds';
+import { setSoundEnabled } from '@/utils/sounds';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect } from 'react';
 import styles from './App.module.css';
@@ -41,9 +41,9 @@ function App() {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
 
-  // Sync sound manager with store
+  // Sync sound setting with store
   useEffect(() => {
-    soundManager.setEnabled(soundEnabled);
+    setSoundEnabled(soundEnabled);
   }, [soundEnabled]);
 
   // Handle AI turn
