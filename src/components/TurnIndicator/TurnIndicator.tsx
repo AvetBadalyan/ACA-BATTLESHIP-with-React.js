@@ -1,10 +1,10 @@
-import { Player } from '@/types';
+import { Player, Position } from '@/types';
 import { motion } from 'framer-motion';
 import styles from './TurnIndicator.module.css';
 
 interface TurnIndicatorProps {
   currentTurn: Player;
-  lastShot?: { result: 'hit' | 'miss' | 'sunk' } | null;
+  lastShot?: { position: Position; result: 'hit' | 'miss' | 'sunk' } | null;
 }
 
 export function TurnIndicator({ currentTurn, lastShot }: TurnIndicatorProps) {
@@ -43,7 +43,7 @@ export function TurnIndicator({ currentTurn, lastShot }: TurnIndicatorProps) {
 
       {lastShot && (
         <motion.div
-          key={`${lastShot.result}-${Date.now()}`}
+          key={`${lastShot.position.row}-${lastShot.position.col}`}
           className={`${styles.lastShot} ${styles[lastShot.result]}`}
           initial={{ scale: 1.5, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}

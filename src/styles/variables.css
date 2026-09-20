@@ -8,31 +8,43 @@
 
   --text-primary: #e8f1ff;
   --text-secondary: #8ba3c7;
-  --text-muted: #5a7294;
+  /* muted text is de-emphasized but must still clear WCAG AA on bg-primary,
+     bg-card and bg-tertiary (the surfaces it actually renders on) */
+  --text-muted: #7d97b5;
 
   --accent-primary: #00d4ff;
   --accent-secondary: #0099cc;
   --accent-glow: rgba(0, 212, 255, 0.3);
+  /* Text on the primary (accent) button. Dark here because the cyan
+     gradient is too light for white text to meet contrast. */
+  --btn-primary-text: #0a1628;
 
   --ocean-light: #1a4a6e;
   --ocean-dark: #0d2840;
 
   --ship-color: #4a6fa5;
+  --ship-color-dark: #2a4a6a;
   --ship-border: #6b8fc5;
 
   --hit-color: #ff4757;
   --hit-glow: rgba(255, 71, 87, 0.5);
   --hit-bg: #8b0000;
+  --hit-bg-dark: #3a0000;
 
   --miss-color: #5a6c7d;
   --miss-bg: #2a3a4a;
+  --miss-bg-dark: #1a2530;
 
   --sunk-color: #ff6b6b;
   --sunk-glow: rgba(255, 107, 107, 0.6);
+  --sunk-bg: #3a0000;
+  --sunk-bg-dark: #1a0000;
 
   --success-color: #2ed573;
+  --success-dark: #1a9e4a;
   --warning-color: #ffa502;
   --error-color: #ff4757;
+  --error-dark: #b02233;
 
   --border-color: #2a3f5f;
   --border-light: #3a5070;
@@ -46,8 +58,15 @@
   --radius-lg: 12px;
   --radius-xl: 16px;
 
+  /* Transitions: fast = micro-interactions, normal = movement, slow = ambient */
   --transition-fast: 150ms ease;
   --transition-normal: 250ms ease;
+  --transition-slow: 500ms ease;
+
+  /* Z-index scale */
+  --z-base: 0;
+  --z-raised: 1;
+  --z-overlay: 100;
 
   --font-mono: 'Courier New', monospace;
   --font-display: 'Segoe UI', system-ui, sans-serif;
@@ -66,33 +85,41 @@
 
   --text-primary: #1a3a5c;
   --text-secondary: #3a6080;
-  --text-muted: #6a90b0;
+  /* darkened from #6a90b0 for AA contrast on white/tertiary surfaces */
+  --text-muted: #4a6d8a;
 
   --accent-primary: #0077b6;
   --accent-secondary: #005a8c;
   --accent-glow: rgba(0, 119, 182, 0.2);
+  /* white reads fine on the deeper blue gradient in light mode */
+  --btn-primary-text: #ffffff;
 
   --ocean-light: #90caf9;
   --ocean-dark: #64b5f6;
-  --ocean-wave: #42a5f5;
 
   --ship-color: #37474f;
+  --ship-color-dark: #1c2b33;
   --ship-border: #546e7a;
-  --ship-glow: rgba(55, 71, 79, 0.3);
 
   --hit-color: #d32f2f;
   --hit-glow: rgba(211, 47, 47, 0.4);
   --hit-bg: #ffcdd2;
+  --hit-bg-dark: #ef9a9a;
 
   --miss-color: #78909c;
   --miss-bg: #cfd8dc;
+  --miss-bg-dark: #b0bec5;
 
   --sunk-color: #b71c1c;
   --sunk-glow: rgba(183, 28, 28, 0.4);
+  --sunk-bg: #ef9a9a;
+  --sunk-bg-dark: #e57373;
 
   --success-color: #2e7d32;
+  --success-dark: #1b5e20;
   --warning-color: #f57c00;
   --error-color: #d32f2f;
+  --error-dark: #8b1a1a;
 
   --border-color: #b0c4de;
   --border-light: #ccd9e8;

@@ -6,7 +6,10 @@
   border-radius: var(--radius-sm);
   position: relative;
   overflow: hidden;
-  transition: all var(--transition-fast);
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background var(--transition-fast);
 }
 
 .cell.clickable {
@@ -23,7 +26,7 @@
 .cell:focus-visible {
   outline: none;
   box-shadow: inset 0 0 0 2px var(--accent-primary);
-  z-index: 4;
+  z-index: var(--z-raised);
 }
 
 .cell.disabled {
@@ -66,7 +69,7 @@
 
 /* Ship cell */
 .cell.ship {
-  background: linear-gradient(135deg, var(--ship-color), #3a5a8a);
+  background: linear-gradient(135deg, var(--ship-color), var(--ship-color-dark));
   border-color: var(--ship-border);
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
 }
@@ -81,20 +84,20 @@
 
 /* Preview states */
 .cell.previewValid {
-  background: linear-gradient(135deg, var(--success-color), #1fa855);
+  background: linear-gradient(135deg, var(--success-color), var(--success-dark));
   border-color: var(--success-color);
   box-shadow: 0 0 15px color-mix(in srgb, var(--success-color) 40%, transparent);
 }
 
 .cell.previewInvalid {
-  background: linear-gradient(135deg, var(--error-color), #cc3344);
+  background: linear-gradient(135deg, var(--error-color), var(--error-dark));
   border-color: var(--error-color);
   box-shadow: 0 0 15px color-mix(in srgb, var(--error-color) 40%, transparent);
 }
 
 /* Hit cell */
 .cell.hit {
-  background: linear-gradient(135deg, var(--hit-bg), #600000);
+  background: linear-gradient(135deg, var(--hit-bg), var(--hit-bg-dark));
   border-color: var(--hit-color);
   box-shadow: 0 0 15px var(--hit-glow);
 }
@@ -135,7 +138,7 @@
 
 /* Miss cell */
 .cell.miss {
-  background: linear-gradient(135deg, var(--miss-bg), #1a2a3a);
+  background: linear-gradient(135deg, var(--miss-bg), var(--miss-bg-dark));
   border-color: var(--miss-color);
 }
 
@@ -168,7 +171,7 @@
 
 /* Sunk cell */
 .cell.sunk {
-  background: linear-gradient(135deg, #4a0000, #2a0000);
+  background: linear-gradient(135deg, var(--sunk-bg), var(--sunk-bg-dark));
   border-color: var(--sunk-color);
   box-shadow: 0 0 20px var(--sunk-glow);
 }

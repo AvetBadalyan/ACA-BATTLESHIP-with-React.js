@@ -4,7 +4,7 @@ import { useGameStore } from '@/store';
 import '@/styles/global.css';
 import { soundManager } from '@/utils/sounds';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useCallback, useEffect } from 'react';
+import { useEffect } from 'react';
 import styles from './App.module.css';
 
 function App() {
@@ -67,18 +67,13 @@ function App() {
   }, [isAnimating, phase, setAnimating]);
 
   // Keyboard handlers
-  const keyboardHandlers = useCallback(
-    () => ({
-      r: () => {
-        if (phase === 'setup') {
-          toggleOrientation();
-        }
-      },
-    }),
-    [phase, toggleOrientation]
-  );
-
-  useKeyboard(keyboardHandlers());
+  useKeyboard({
+    r: () => {
+      if (phase === 'setup') {
+        toggleOrientation();
+      }
+    },
+  });
 
   return (
     <div className={styles.app}>

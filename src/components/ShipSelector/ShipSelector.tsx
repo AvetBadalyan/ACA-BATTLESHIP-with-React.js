@@ -1,6 +1,5 @@
+import { Orientation, Ship, SHIP_TYPES, ShipType } from '@/types';
 import { motion } from 'framer-motion';
-import { ShipType, Orientation, Ship } from '@/types';
-import { SHIP_TYPES } from '@/types';
 import styles from './ShipSelector.module.css';
 
 interface ShipSelectorProps {
@@ -45,11 +44,15 @@ export function ShipSelector({
       <div className={styles.shipList}>
         {SHIP_TYPES.map((ship) => {
           const status = getShipStatus(ship);
+          const isSelected = status === 'selected';
+          const isPlaced = status === 'placed';
           return (
             <motion.button
               key={ship.id}
               className={`${styles.shipItem} ${styles[status]}`}
-              onClick={() => onSelectShip(status === 'selected' ? null : ship)}
+              onClick={() => onSelectShip(isSelected ? null : ship)}
+              aria-label={`${ship.name} (${ship.size} cells)${isPlaced ? ', placed' : ''}${isSelected ? ', selected' : ''}`}
+              aria-pressed={isSelected}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
@@ -74,6 +77,8 @@ export function ShipSelector({
           <button
             className={`${styles.orientationBtn} ${orientation === 'horizontal' ? styles.active : ''}`}
             onClick={onToggleOrientation}
+            aria-label={`Orientation: ${orientation}`}
+            aria-pressed={orientation === 'vertical'}
           >
             <span className={styles.orientationIcon}>
               {orientation === 'horizontal' ? '↔️' : '↕️'}
