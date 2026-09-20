@@ -24,9 +24,9 @@ export function ShipSelector({
   onClear,
   onStartGame,
 }: ShipSelectorProps) {
-  const isShipPlaced = (shipId: string) => placedShips.some(s => s.id === shipId);
+  const isShipPlaced = (shipId: string) => placedShips.some((s) => s.id === shipId);
   const allShipsPlaced = placedShips.length === SHIP_TYPES.length;
-  
+
   const getShipStatus = (ship: ShipType) => {
     if (selectedShip?.id === ship.id) return 'selected';
     if (isShipPlaced(ship.id)) return 'placed';
@@ -41,7 +41,7 @@ export function ShipSelector({
       transition={{ duration: 0.3, delay: 0.1 }}
     >
       <h3 className={styles.title}>Fleet</h3>
-      
+
       <div className={styles.shipList}>
         {SHIP_TYPES.map((ship) => {
           const status = getShipStatus(ship);
@@ -62,14 +62,12 @@ export function ShipSelector({
                   <div key={i} className={styles.shipCell} />
                 ))}
               </div>
-              {status === 'placed' && (
-                <span className={styles.checkmark}>✓</span>
-              )}
+              {status === 'placed' && <span className={styles.checkmark}>✓</span>}
             </motion.button>
           );
         })}
       </div>
-      
+
       <div className={styles.controls}>
         <div className={styles.orientationControl}>
           <span className={styles.label}>Orientation:</span>
@@ -84,13 +82,13 @@ export function ShipSelector({
           </button>
           <span className={styles.hint}>Press R to rotate</span>
         </div>
-        
+
         <div className={styles.actionButtons}>
           <button className="btn btn-secondary btn-sm" onClick={onRandomize}>
             🎲 Randomize
           </button>
-          <button 
-            className="btn btn-secondary btn-sm" 
+          <button
+            className="btn btn-secondary btn-sm"
             onClick={onClear}
             disabled={placedShips.length === 0}
           >
@@ -98,7 +96,7 @@ export function ShipSelector({
           </button>
         </div>
       </div>
-      
+
       <motion.button
         className={`btn btn-primary ${styles.startButton}`}
         onClick={onStartGame}
@@ -106,7 +104,9 @@ export function ShipSelector({
         whileHover={allShipsPlaced ? { scale: 1.05 } : undefined}
         whileTap={allShipsPlaced ? { scale: 0.95 } : undefined}
       >
-        {allShipsPlaced ? '⚔️ Start Battle!' : `Place ${SHIP_TYPES.length - placedShips.length} more ships`}
+        {allShipsPlaced
+          ? '⚔️ Start Battle!'
+          : `Place ${SHIP_TYPES.length - placedShips.length} more ships`}
       </motion.button>
     </motion.div>
   );

@@ -123,11 +123,11 @@
     min-width: auto;
     padding: 12px;
   }
-  
+
   .statsGrid {
     gap: 8px;
   }
-  
+
   .statValue {
     font-size: 1.25rem;
   }

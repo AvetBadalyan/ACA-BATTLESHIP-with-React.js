@@ -50,7 +50,7 @@ export function canPlaceShip(
   excludeShipId?: string
 ): boolean {
   const positions = getShipPositions(startPos, size, orientation);
-  
+
   // Check all positions are valid and not occupied
   for (const pos of positions) {
     if (!isValidPosition(pos)) {
@@ -61,7 +61,7 @@ export function canPlaceShip(
       return false;
     }
   }
-  
+
   return true;
 }
 
@@ -75,10 +75,10 @@ export function placeShip(
   if (!canPlaceShip(board, startPos, shipType.size, orientation)) {
     return null;
   }
-  
+
   const positions = getShipPositions(startPos, shipType.size, orientation);
-  const newBoard = board.map(row => row.map(cell => ({ ...cell })));
-  
+  const newBoard = board.map((row) => row.map((cell) => ({ ...cell })));
+
   // Mark cells as ship
   for (const pos of positions) {
     newBoard[pos.row][pos.col] = {
@@ -87,7 +87,7 @@ export function placeShip(
       shipId: shipType.id,
     };
   }
-  
+
   const ship: Ship = {
     id: shipType.id,
     name: shipType.name,
@@ -97,14 +97,14 @@ export function placeShip(
     hits: [],
     isSunk: false,
   };
-  
+
   return { board: newBoard, ship };
 }
 
 // Remove a ship from the board
 export function removeShip(board: Board, shipId: string): Board {
-  return board.map(row =>
-    row.map(cell => {
+  return board.map((row) =>
+    row.map((cell) => {
       if (cell.shipId === shipId) {
         return { ...cell, state: 'empty', shipId: null };
       }
@@ -117,22 +117,22 @@ export function removeShip(board: Board, shipId: string): Board {
 export function placeShipsRandomly(): { board: Board; ships: Ship[] } {
   let board = createEmptyBoard();
   const ships: Ship[] = [];
-  
+
   for (const shipType of SHIP_TYPES) {
     let placed = false;
     let attempts = 0;
     const maxAttempts = 100;
-    
+
     while (!placed && attempts < maxAttempts) {
       const orientation: Orientation = Math.random() < 0.5 ? 'horizontal' : 'vertical';
       const maxRow = orientation === 'vertical' ? BOARD_SIZE - shipType.size : BOARD_SIZE - 1;
       const maxCol = orientation === 'horizontal' ? BOARD_SIZE - shipType.size : BOARD_SIZE - 1;
-      
+
       const startPos: Position = {
         row: Math.floor(Math.random() * (maxRow + 1)),
         col: Math.floor(Math.random() * (maxCol + 1)),
       };
-      
+
       const result = placeShip(board, shipType, startPos, orientation);
       if (result) {
         board = result.board;
@@ -141,13 +141,13 @@ export function placeShipsRandomly(): { board: Board; ships: Ship[] } {
       }
       attempts++;
     }
-    
+
     if (!placed) {
       // This shouldn't happen with standard fleet, but just in case
       console.error(`Failed to place ${shipType.name} after ${maxAttempts} attempts`);
     }
   }
-  
+
   return { board, ships };
 }
 
@@ -156,21 +156,21 @@ export function processShot(
   board: Board,
   ships: Ship[],
   position: Position
-): { 
-  board: Board; 
-  ships: Ship[]; 
+): {
+  board: Board;
+  ships: Ship[];
   result: 'hit' | 'miss' | 'sunk';
   sunkShip?: Ship;
 } {
   const cell = board[position.row][position.col];
-  const newBoard = board.map(row => row.map(c => ({ ...c })));
-  
+  const newBoard = board.map((row) => row.map((c) => ({ ...c })));
+
   if (cell.state === 'ship') {
     // Hit!
     newBoard[position.row][position.col].state = 'hit';
-    
+
     // Update ship hits
-    const newShips = ships.map(ship => {
+    const newShips = ships.map((ship) => {
       if (ship.id === cell.shipId) {
         const newHits = [...ship.hits, position];
         const isSunk = newHits.length === ship.size;
@@ -178,9 +178,9 @@ export function processShot(
       }
       return ship;
     });
-    
+
     // Check if ship is sunk
-    const hitShip = newShips.find(s => s.id === cell.shipId);
+    const hitShip = newShips.find((s) => s.id === cell.shipId);
     if (hitShip?.isSunk) {
       // Mark all ship cells as sunk
       for (const pos of hitShip.positions) {
@@ -188,7 +188,7 @@ export function processShot(
       }
       return { board: newBoard, ships: newShips, result: 'sunk', sunkShip: hitShip };
     }
-    
+
     return { board: newBoard, ships: newShips, result: 'hit' };
   } else {
     // Miss
@@ -199,7 +199,7 @@ export function processShot(
 
 // Check if all ships are sunk (game over condition)
 export function areAllShipsSunk(ships: Ship[]): boolean {
-  return ships.every(ship => ship.isSunk);
+  return ships.every((ship) => ship.isSunk);
 }
 
 // Get cells that haven't been shot yet

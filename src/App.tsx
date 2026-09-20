@@ -1,14 +1,7 @@
 import { useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useGameStore } from '@/store';
-import {
-  Header,
-  Board,
-  ShipSelector,
-  GameStats,
-  TurnIndicator,
-  GameOverModal,
-} from '@/components';
+import { Header, Board, ShipSelector, GameStats, TurnIndicator, GameOverModal } from '@/components';
 import { useKeyboard } from '@/hooks';
 import { soundManager } from '@/utils/sounds';
 import '@/styles/global.css';
@@ -75,20 +68,23 @@ function App() {
   }, [isAnimating, phase, setAnimating]);
 
   // Keyboard handlers
-  const keyboardHandlers = useCallback(() => ({
-    'r': () => {
-      if (phase === 'setup') {
-        toggleOrientation();
-      }
-    },
-  }), [phase, toggleOrientation]);
+  const keyboardHandlers = useCallback(
+    () => ({
+      r: () => {
+        if (phase === 'setup') {
+          toggleOrientation();
+        }
+      },
+    }),
+    [phase, toggleOrientation]
+  );
 
   useKeyboard(keyboardHandlers());
 
   return (
     <div className={styles.app}>
       <Header />
-      
+
       <main className={styles.main}>
         <AnimatePresence mode="wait">
           {phase === 'setup' && (
@@ -110,7 +106,7 @@ function App() {
                   onClear={clearPlacement}
                   onStartGame={startGame}
                 />
-                
+
                 <Board
                   board={playerBoard}
                   title="Your Fleet"
@@ -118,16 +114,18 @@ function App() {
                   selectedShip={selectedShip}
                   shipOrientation={shipOrientation}
                   onShipPlace={placePlayerShip}
-                  placedShipIds={playerShips.map(s => s.id)}
+                  placedShipIds={playerShips.map((s) => s.id)}
                 />
               </div>
-              
+
               <div className={styles.instructions}>
                 <h3>📋 Instructions</h3>
                 <ul>
                   <li>Select a ship from the fleet panel</li>
                   <li>Click on the board to place it</li>
-                  <li>Press <kbd>R</kbd> or click the orientation button to rotate</li>
+                  <li>
+                    Press <kbd>R</kbd> or click the orientation button to rotate
+                  </li>
                   <li>Use "Randomize" for quick placement</li>
                   <li>Place all 5 ships to start the battle!</li>
                 </ul>
@@ -148,16 +146,10 @@ function App() {
                 difficulty={difficulty}
                 lastShot={lastShot}
               />
-              
+
               <div className={styles.gameBoards}>
                 <div className={styles.boardSection}>
-                  <Board
-                    board={playerBoard}
-                    title="Your Fleet"
-                    isPlayerBoard
-                    showShips
-                    disabled
-                  />
+                  <Board board={playerBoard} title="Your Fleet" isPlayerBoard showShips disabled />
                   <GameStats
                     stats={aiStats}
                     ships={playerShips}
@@ -165,7 +157,7 @@ function App() {
                     isPlayer={false}
                   />
                 </div>
-                
+
                 <div className={styles.boardSection}>
                   <Board
                     board={aiBoard}
@@ -174,12 +166,7 @@ function App() {
                     disabled={currentTurn !== 'player' || isAnimating}
                     onCellClick={playerShoot}
                   />
-                  <GameStats
-                    stats={playerStats}
-                    ships={aiShips}
-                    title="Your Progress"
-                    isPlayer
-                  />
+                  <GameStats stats={playerStats} ships={aiShips} title="Your Progress" isPlayer />
                 </div>
               </div>
             </motion.div>

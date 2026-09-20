@@ -20,7 +20,8 @@
 }
 
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0) rotate(-5deg);
   }
   50% {
@@ -109,34 +110,34 @@
     flex-wrap: wrap;
     gap: 12px;
   }
-  
+
   .title {
     font-size: 1.25rem;
   }
-  
+
   .logoIcon {
     font-size: 1.5rem;
   }
-  
+
   .controls {
     gap: 8px;
   }
-  
+
   .difficultySelect {
     flex-direction: column;
     align-items: flex-start;
     gap: 4px;
   }
-  
+
   .label {
     font-size: 0.7rem;
   }
-  
+
   .select {
     padding: 6px 10px;
     font-size: 0.85rem;
   }
-  
+
   .iconButton {
     width: 40px;
     height: 40px;

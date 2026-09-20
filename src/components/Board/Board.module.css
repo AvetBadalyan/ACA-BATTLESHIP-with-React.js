@@ -74,17 +74,17 @@
   .title {
     font-size: 1rem;
   }
-  
+
   .cornerLabel {
     width: 24px;
     height: 20px;
   }
-  
+
   .label {
     height: 20px;
     font-size: 0.65rem;
   }
-  
+
   .rowLabel {
     width: 20px;
     font-size: 0.65rem;
@@ -96,17 +96,17 @@
   .boardWrapper {
     padding: 8px;
   }
-  
+
   .cornerLabel {
     width: 20px;
     height: 18px;
   }
-  
+
   .label {
     height: 18px;
     font-size: 0.6rem;
   }
-  
+
   .rowLabel {
     width: 18px;
     font-size: 0.6rem;

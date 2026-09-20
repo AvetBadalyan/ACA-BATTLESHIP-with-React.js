@@ -18,13 +18,11 @@ export function GameOverModal({
   onPlayAgain,
 }: GameOverModalProps) {
   const isVictory = winner === 'player';
-  
+
   const getAccuracy = (stats: GameStatsType) => {
-    return stats.shotsFired > 0 
-      ? Math.round((stats.hits / stats.shotsFired) * 100) 
-      : 0;
+    return stats.shotsFired > 0 ? Math.round((stats.hits / stats.shotsFired) * 100) : 0;
   };
-  
+
   const getGameDuration = (stats: GameStatsType) => {
     if (!stats.startTime || !stats.endTime) return '0:00';
     const seconds = Math.floor((stats.endTime - stats.startTime) / 1000);
@@ -58,16 +56,14 @@ export function GameOverModal({
               >
                 {isVictory ? '🏆' : '💀'}
               </motion.div>
-              <h2 className={styles.title}>
-                {isVictory ? 'Victory!' : 'Defeat'}
-              </h2>
+              <h2 className={styles.title}>{isVictory ? 'Victory!' : 'Defeat'}</h2>
               <p className={styles.subtitle}>
-                {isVictory 
-                  ? "You've destroyed the enemy fleet!" 
-                  : "Your fleet has been destroyed..."}
+                {isVictory
+                  ? "You've destroyed the enemy fleet!"
+                  : 'Your fleet has been destroyed...'}
               </p>
             </div>
-            
+
             <div className={styles.statsComparison}>
               <div className={styles.statColumn}>
                 <h4 className={styles.statTitle}>Your Stats</h4>
@@ -81,16 +77,18 @@ export function GameOverModal({
                 </div>
                 <div className={styles.statItem}>
                   <span>Accuracy</span>
-                  <span className={`${styles.statValue} ${styles.accuracy}`}>{getAccuracy(playerStats)}%</span>
+                  <span className={`${styles.statValue} ${styles.accuracy}`}>
+                    {getAccuracy(playerStats)}%
+                  </span>
                 </div>
                 <div className={styles.statItem}>
                   <span>Ships Destroyed</span>
                   <span className={styles.statValue}>{playerStats.shipsDestroyed}</span>
                 </div>
               </div>
-              
+
               <div className={styles.divider} />
-              
+
               <div className={styles.statColumn}>
                 <h4 className={styles.statTitle}>AI Stats</h4>
                 <div className={styles.statItem}>
@@ -103,7 +101,9 @@ export function GameOverModal({
                 </div>
                 <div className={styles.statItem}>
                   <span>Accuracy</span>
-                  <span className={`${styles.statValue} ${styles.accuracy}`}>{getAccuracy(aiStats)}%</span>
+                  <span className={`${styles.statValue} ${styles.accuracy}`}>
+                    {getAccuracy(aiStats)}%
+                  </span>
                 </div>
                 <div className={styles.statItem}>
                   <span>Ships Destroyed</span>
@@ -111,12 +111,12 @@ export function GameOverModal({
                 </div>
               </div>
             </div>
-            
+
             <div className={styles.gameTime}>
               <span className={styles.timeIcon}>⏱️</span>
               <span>Game Duration: {getGameDuration(playerStats)}</span>
             </div>
-            
+
             <motion.button
               className={`btn btn-primary ${styles.playAgainBtn}`}
               onClick={onPlayAgain}

@@ -1,180 +1,180 @@
 .app {
-	min-height: 100vh;
-	display: flex;
-	flex-direction: column;
-	background: var(--bg-primary);
-	background-image: url('@/assets/battleship-wallpapers.jpg');
-	background-size: cover;
-	background-attachment: fixed;
-	background-position: center;
-	position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-primary);
+  background-image: url('@/assets/battleship-wallpapers.jpg');
+  background-size: cover;
+  background-attachment: fixed;
+  background-position: center;
+  position: relative;
 }
 
 .app::before {
-	content: '';
-	position: fixed;
-	inset: 0;
-	background: var(--bg-primary);
-	opacity: 0.85;
-	z-index: 0;
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: var(--bg-primary);
+  opacity: 0.85;
+  z-index: 0;
 }
 
 .app > * {
-	position: relative;
-	z-index: 1;
+  position: relative;
+  z-index: 1;
 }
 
 .main {
-	flex: 1;
-	display: flex;
-	flex-direction: column;
-	padding: 24px;
-	overflow-x: hidden;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  overflow-x: hidden;
 }
 
 /* Setup Phase */
 .setupPhase {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 20px;
-	width: 100%;
-	max-width: 1200px;
-	margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .setupContent {
-	display: flex;
-	gap: 32px;
-	align-items: flex-start;
-	justify-content: center;
-	flex-wrap: wrap;
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 .instructions {
-	background: var(--bg-card);
-	border-radius: var(--radius-lg);
-	border: 1px solid var(--border-color);
-	padding: 12px 20px;
-	width: 100%;
-	max-width: 900px;
-	box-shadow: var(--shadow-md);
-	display: flex;
-	align-items: center;
-	flex-wrap: wrap;
-	gap: 8px 20px;
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  padding: 12px 20px;
+  width: 100%;
+  max-width: 900px;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 20px;
 }
 
 .instructions h3 {
-	font-size: 1rem;
-	color: var(--accent-primary);
-	margin: 0;
-	white-space: nowrap;
+  font-size: 1rem;
+  color: var(--accent-primary);
+  margin: 0;
+  white-space: nowrap;
 }
 
 .instructions ul {
-	list-style: none;
-	display: flex;
-	flex-direction: row;
-	flex-wrap: wrap;
-	align-items: center;
-	gap: 6px 18px;
-	margin: 0;
-	padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 18px;
+  margin: 0;
+  padding: 0;
 }
 
 .instructions li {
-	color: var(--text-secondary);
-	font-size: 0.85rem;
-	padding-left: 18px;
-	position: relative;
-	white-space: nowrap;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  padding-left: 18px;
+  position: relative;
+  white-space: nowrap;
 }
 
 .instructions li::before {
-	content: '→';
-	position: absolute;
-	left: 0;
-	color: var(--accent-primary);
+  content: '→';
+  position: absolute;
+  left: 0;
+  color: var(--accent-primary);
 }
 
 .instructions kbd {
-	display: inline-block;
-	padding: 2px 8px;
-	background: var(--bg-tertiary);
-	border: 1px solid var(--border-color);
-	border-radius: var(--radius-sm);
-	font-family: var(--font-mono);
-	font-size: 0.85em;
-	color: var(--accent-primary);
+  display: inline-block;
+  padding: 2px 8px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  color: var(--accent-primary);
 }
 
 /* Playing Phase */
 .playingPhase {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 24px;
-	width: 100%;
-	max-width: 1400px;
-	margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 .gameBoards {
-	display: flex;
-	gap: 48px;
-	justify-content: center;
-	flex-wrap: wrap;
+  display: flex;
+  gap: 48px;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 .boardSection {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
 }
 
 /* Responsive */
 @media (max-width: 1024px) {
-	.gameBoards {
-		gap: 32px;
-	}
+  .gameBoards {
+    gap: 32px;
+  }
 }
 
 @media (max-width: 768px) {
-	.main {
-		padding: 16px;
-	}
+  .main {
+    padding: 16px;
+  }
 
-	.setupContent {
-		flex-direction: column;
-		align-items: center;
-	}
+  .setupContent {
+    flex-direction: column;
+    align-items: center;
+  }
 
-	.gameBoards {
-		flex-direction: column;
-		gap: 24px;
-	}
+  .gameBoards {
+    flex-direction: column;
+    gap: 24px;
+  }
 
-	.instructions {
-		padding: 12px 16px;
-		flex-direction: column;
-		align-items: flex-start;
-	}
+  .instructions {
+    padding: 12px 16px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
 
-	.instructions ul {
-		flex-direction: column;
-		align-items: flex-start;
-	}
+  .instructions ul {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 @media (max-width: 480px) {
-	.main {
-		padding: 12px;
-	}
+  .main {
+    padding: 12px;
+  }
 
-	.setupPhase,
-	.playingPhase {
-		gap: 16px;
-	}
+  .setupPhase,
+  .playingPhase {
+    gap: 16px;
+  }
 }

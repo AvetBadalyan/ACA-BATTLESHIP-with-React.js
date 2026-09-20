@@ -1,200 +1,196 @@
 .container {
-	background: var(--bg-card);
-	border-radius: var(--radius-lg);
-	border: 1px solid var(--border-color);
-	padding: 24px;
-	display: flex;
-	flex-direction: column;
-	gap: 20px;
-	min-width: 280px;
-	box-shadow: var(--shadow-md);
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 280px;
+  box-shadow: var(--shadow-md);
 }
 
 .title {
-	font-size: 1.25rem;
-	font-weight: 600;
-	color: var(--text-primary);
-	text-transform: uppercase;
-	letter-spacing: 0.1em;
-	text-align: center;
-	margin-bottom: 8px;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-align: center;
+  margin-bottom: 8px;
 }
 
 .shipList {
-	display: flex;
-	flex-direction: column;
-	gap: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .shipItem {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	padding: 12px 16px;
-	background: var(--bg-tertiary);
-	border: 2px solid var(--border-color);
-	border-radius: var(--radius-md);
-	cursor: pointer;
-	transition: all var(--transition-fast);
-	position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--bg-tertiary);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  position: relative;
 }
 
 .shipItem:hover {
-	border-color: var(--accent-primary);
-	background: var(--bg-secondary);
+  border-color: var(--accent-primary);
+  background: var(--bg-secondary);
 }
 
 .shipItem.selected {
-	border-color: var(--accent-primary);
-	background: color-mix(in srgb, var(--accent-primary) 10%, transparent);
-	box-shadow: 0 0 15px var(--accent-glow);
+  border-color: var(--accent-primary);
+  background: color-mix(in srgb, var(--accent-primary) 10%, transparent);
+  box-shadow: 0 0 15px var(--accent-glow);
 }
 
 .shipItem.placed {
-	border-color: var(--success-color);
-	background: color-mix(in srgb, var(--success-color) 10%, transparent);
+  border-color: var(--success-color);
+  background: color-mix(in srgb, var(--success-color) 10%, transparent);
 }
 
 .shipItem.placed:hover {
-	border-color: var(--accent-primary);
+  border-color: var(--accent-primary);
 }
 
 .shipInfo {
-	display: flex;
-	flex-direction: column;
-	align-items: flex-start;
-	gap: 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
 }
 
 .shipName {
-	font-weight: 600;
-	color: var(--text-primary);
-	font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 0.95rem;
 }
 
 .shipSize {
-	font-size: 0.75rem;
-	color: var(--text-muted);
+  font-size: 0.75rem;
+  color: var(--text-muted);
 }
 
 .shipPreview {
-	display: flex;
-	gap: 2px;
+  display: flex;
+  gap: 2px;
 }
 
 .shipCell {
-	width: 16px;
-	height: 16px;
-	background: linear-gradient(135deg, var(--ship-color), #3a5a8a);
-	border: 1px solid var(--ship-border);
-	border-radius: 2px;
+  width: 16px;
+  height: 16px;
+  background: linear-gradient(135deg, var(--ship-color), #3a5a8a);
+  border: 1px solid var(--ship-border);
+  border-radius: 2px;
 }
 
 .selected .shipCell {
-	background: linear-gradient(
-		135deg,
-		var(--accent-primary),
-		var(--accent-secondary)
-	);
-	border-color: var(--accent-primary);
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  border-color: var(--accent-primary);
 }
 
 .placed .shipCell {
-	background: linear-gradient(135deg, var(--success-color), #1fa855);
-	border-color: var(--success-color);
+  background: linear-gradient(135deg, var(--success-color), #1fa855);
+  border-color: var(--success-color);
 }
 
 .checkmark {
-	position: absolute;
-	right: 8px;
-	top: 50%;
-	transform: translateY(-50%);
-	color: var(--success-color);
-	font-size: 1.25rem;
-	font-weight: bold;
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--success-color);
+  font-size: 1.25rem;
+  font-weight: bold;
 }
 
 .controls {
-	display: flex;
-	flex-direction: column;
-	gap: 16px;
-	padding-top: 8px;
-	border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-color);
 }
 
 .orientationControl {
-	display: flex;
-	flex-direction: column;
-	gap: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .label {
-	font-size: 0.85rem;
-	color: var(--text-muted);
-	text-transform: uppercase;
-	letter-spacing: 0.05em;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .orientationBtn {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	padding: 10px 16px;
-	background: var(--bg-tertiary);
-	border: 1px solid var(--border-color);
-	border-radius: var(--radius-md);
-	cursor: pointer;
-	transition: all var(--transition-fast);
-	color: var(--text-primary);
-	font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  color: var(--text-primary);
+  font-size: 0.9rem;
 }
 
 .orientationBtn:hover,
 .orientationBtn.active {
-	border-color: var(--accent-primary);
-	background: color-mix(in srgb, var(--accent-primary) 10%, transparent);
+  border-color: var(--accent-primary);
+  background: color-mix(in srgb, var(--accent-primary) 10%, transparent);
 }
 
 .orientationIcon {
-	font-size: 1.25rem;
+  font-size: 1.25rem;
 }
 
 .hint {
-	font-size: 0.75rem;
-	color: var(--text-muted);
-	font-style: italic;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-style: italic;
 }
 
 .actionButtons {
-	display: flex;
-	gap: 8px;
+  display: flex;
+  gap: 8px;
 }
 
 .actionButtons button {
-	flex: 1;
+  flex: 1;
 }
 
 .startButton {
-	width: 100%;
-	padding: 16px;
-	font-size: 1.1rem;
-	margin-top: 8px;
+  width: 100%;
+  padding: 16px;
+  font-size: 1.1rem;
+  margin-top: 8px;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-	.container {
-		min-width: auto;
-		width: 100%;
-		padding: 16px;
-	}
+  .container {
+    min-width: auto;
+    width: 100%;
+    padding: 16px;
+  }
 
-	.shipItem {
-		padding: 10px 12px;
-	}
+  .shipItem {
+    padding: 10px 12px;
+  }
 
-	.shipCell {
-		width: 14px;
-		height: 14px;
-	}
+  .shipCell {
+    width: 14px;
+    height: 14px;
+  }
 }

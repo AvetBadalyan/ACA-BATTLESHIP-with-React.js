@@ -68,23 +68,23 @@ export interface GameState {
   difficulty: Difficulty;
   currentTurn: Player;
   winner: Player | null;
-  
+
   // Player data
   playerBoard: Board;
   playerShips: Ship[];
   playerStats: GameStats;
-  
+
   // AI data
   aiBoard: Board;
   aiShips: Ship[];
   aiStats: GameStats;
-  
+
   // UI state
   selectedShip: ShipType | null;
   shipOrientation: Orientation;
   isAnimating: boolean;
   lastShot: { position: Position; result: 'hit' | 'miss' | 'sunk' } | null;
-  
+
   // Settings
   soundEnabled: boolean;
   theme: 'dark' | 'light';
